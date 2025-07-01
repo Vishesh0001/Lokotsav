@@ -1,0 +1,10 @@
+
+@import "tailwindcss";
+@theme{
+  --color-softPink: #DE9BB8;
+  --color-base: #F6F0CD;
+  --color-accent: #DB9DF0;
+  --color-softGray: #D3D3D3;
+ --color-deepNavy:#1F2A44;
+ --color-mutedGold:#D4A017;
+}
