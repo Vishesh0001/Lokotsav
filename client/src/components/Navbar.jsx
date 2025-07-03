@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, MapPin, Plus } from 'lucide-react';
+import { Search, MapPin, Plus, Radar } from 'lucide-react';
 
 export default function Navbar({ user, role }) {
   const [search, setSearch] = useState('');
@@ -23,8 +23,9 @@ export default function Navbar({ user, role }) {
   return (
 <nav className="sticky top-0 z-50 bg-base shadow-md border-b border-softGray backdrop-blur-md px-4 sm:px-6 lg:px-8">
   <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4 py-3">
-    <img src="/globe.svg" alt="Lokotsav Logo" className="h-12 w-auto text-white" />
-    <Link href="/" className="text-3xl font-bold text-softPink">
+    {/* <img src="/globe.svg" alt="Lokotsav Logo" className="h-12 w-auto text-white" /> */}
+  <Link href='/'><Radar className='h-12 w-12 text-gray-500 hover:text-purple-400'/></Link>  
+    <Link href="/" className="text-3xl font-bold text-softPink hover:text-accent">
       Lokotsav
     </Link>
 
@@ -94,14 +95,7 @@ export default function Navbar({ user, role }) {
           Login
         </Button>
       </Link>
-      <Link href="/signup">
-        <Button
-          variant="outline"
-          className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
-        >
-          Sign Up
-        </Button>
-      </Link>
+      
     </div>
   </div>
 </nav>

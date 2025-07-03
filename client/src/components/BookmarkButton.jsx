@@ -4,27 +4,31 @@ import { BookmarkCheck } from 'lucide-react';
 
 import { useState, useEffect } from 'react';
 import secureFetch from '@/utils/securefetch';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 export default function BookmarkButton({ event_id }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [error, setError] = useState(null);
-
+const [Loading,setLoading] = useState(true)
+  const router = useRouter();
   
   useEffect(() => {
     async function checkBookmark() {
       try {
-        console.log('eventiddd',event_id);
-        
-        console.log('werwerwer');
+      const token = Cookies.get("token");
+        if (!token) return; // Don't check if not logged in
         
         const response = await secureFetch('/getbookmark', { event_id }, 'POST');
-        console.log('erwerwerwer',response);
+        // console.log('erwerwerwer',response);
         
         if (response.code ==1) {
           setIsBookmarked(response.data.is_bookmarked == 1);
         }
       } catch (err) {
         console.error('Failed to check bookmark:', err);
+      }finally{
+        setLoading(false)
       }
     
       
@@ -33,30 +37,51 @@ export default function BookmarkButton({ event_id }) {
   }, [event_id]);
 
   const toggleBookmark = async () => {
+        const token = Cookies.get("token");
+
+    if (!token) {
+      toast.warning("You need to login first", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
     try {
       const response = await secureFetch('/bookmark', { event_id }, 'POST');
       // console.log("res2",response);
-      
+
       if (response.code == 1) {
         // console.log(response.data.is_bookmarked != 1);
         
-        setIsBookmarked(response.data.is_bookmarked != 1);
-        setError(null);
+        if(isBookmarked == false){
+          setIsBookmarked(true)
+          toast.success("Event Bookmarked")
+        }else{
+          setIsBookmarked(false);
+          toast.success("Bookmark Removed")
+        }
+       
+        // console.log("toast for bookmarkl");
+
+ 
       } else {
-        setError(response.message.keyword);
+        toast.error(response.message.keyword)
+
       }
       // console.log("heel");
       
     } catch (err) {
-      setError('Failed to toggle bookmark');
+    toast.error(err.message)
     }
   };
 
   return (
     <div>
       <button
-        onClick={toggleBookmark} className=" text-gray-500 hover:text-blue-600 transition">
-        {isBookmarked ? <BookmarkCheck className='text-deepNavy'/> : <Bookmark/>}
+       disabled={Loading} onClick={toggleBookmark} className=" text-gray-500 hover:text-blue-600 transition">
+        {isBookmarked ? <BookmarkCheck /> : <Bookmark/>}
       </button>
 
     </div>

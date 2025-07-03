@@ -2,7 +2,7 @@ import BookmarkButton from "@/components/BookmarkButton";
 import { Button } from "@/components/ui/button";
 import secureFetch from "@/utils/securefetch"
 import Link from "next/link";
-
+import { Ticket } from "lucide-react";
 export default async function event({params}) {
 const {id} = await params;
 let resdata;
@@ -44,7 +44,7 @@ return(
     <div className="mb-5 p-1 w-9 h-9 rounded-4xl  text-center bg-softPink hover:bg-accent">  <BookmarkButton event_id={id} />
    
     </div>
-     <Link href='/user/ticket/${id}'><Button variant='outline'>Buy Tickets</Button></Link>
+     <Link href='/user/ticket/${id}'><Button variant='outline'><Ticket/>Buy Tickets</Button></Link>
             </div>  
   </div>
 </div>

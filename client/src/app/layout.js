@@ -2,7 +2,7 @@
 import Navbar from "@/components/Navbar";
 import "./globals.css";
 
-
+import { Toaster } from "sonner";
 
 
 export const metadata = {
@@ -14,7 +14,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
      
-     <body className="bg-base text-black"> <Navbar/>{children}</body>
+     <body className="bg-base text-black">
+       <Navbar/>{children}
+     <Toaster offset={80}
+  position="top-center"
+/>
+       </body>
+    
     </html>
   );
 }

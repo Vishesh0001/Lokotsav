@@ -130,8 +130,71 @@ class User{
           
         }
       }
-
-
+      async createEvent(req,res){
+    
+        try {
+            // console.log(req.body);
+            
+            const requestData = await common.decodeBody(req.body);
+            const user_id = await common.getUserIdFromToken(req)
+            const validationResponse = await validateWithJoi.checkValidation(requestData, schema.event);
+            if (validationResponse) {
+                return common.sendResponse(req, res, validationResponse.code, validationResponse.message,validationResponse.data,400);
+            }else{
+      
+            const response = await userModel.createEvent(requestData,user_id);
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);}
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+      
+}
+ async getBookmarkedEvents(req,res){
+  try {
+    // let event_id = await common.decodeBody(req.body)
+    // let event_id = req.body
+    // console.log("searchtrerm",searchTerm);
+    // console.log("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.getBookmarkedEvents(user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+    
+  }
+ }
+ async getsubmitted(req,res){
+  try {
+    // let event_id = await common.decodeBody(req.body)
+    // let event_id = req.body
+    // console.log("searchtrerm",searchTerm);
+    // console.log("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.getsubmitted(user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+    
+  }
+ }
+     async searchEvent(req,res){
+        try {
+          let searchTerm = await common.decodeBody(req.body)
+          // console.log("searchtrerm",searchTerm);
+          
+          let response = await userModel.searchEvent(searchTerm)
+          common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+        } catch (error) {
+          console.log("controller eror",error.message)
+          common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+          
+        }
+      }
       }
     
     module.exports = new User();

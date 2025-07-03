@@ -82,8 +82,16 @@ const decryptedData = decrypt(encryptedText);
 // const finalData= decryptedData.data
 return decryptedData; 
   } catch (error) {
-    console.error('Error in secureFetch:', error);
-    throw new Error('Error while making the secure API request');
+    console.log(' login error',error);
+    console.log("login errroe dtaa",error.response.data)
+    const encryptedText = error.response.data;
+
+const decryptedData = decrypt(encryptedText);
+console.log('dec data in login',decryptedData);
+
+return decryptedData
+    // console.error('Error in secureFetch:', error);
+    // throw new Error('Error while making the secure API request');
   }
 };
 

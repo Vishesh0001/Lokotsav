@@ -57,13 +57,14 @@ export default function HeroSection() {
               🎉 Explore Events
             </Button>
           </Link>
-          
+          <Link href='/user/create-event'>
           <Button 
             variant="outline" 
             size="lg" 
             className="px-8 py-4 text-lg font-semibold rounded-full border-2 border-softPink text-accent bg-transparent hover:bg-softPink/10 hover:shadow-lg transform hover:scale-105 transition-all duration-300">
             📍 Create Event
           </Button>
+          </Link>
         </div>
 
         {/* Stats or Features */}

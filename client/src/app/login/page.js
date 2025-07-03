@@ -1,51 +1,45 @@
-
 "use client";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 import secureFetch from "@/utils/securefetch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { toast } from "sonner";
+
 export default function Login() {
   const router = useRouter();
-  const [loginMethod, setLoginMethod] = useState("email");
 
   const formik = useFormik({
-    initialValues: { email: "", phone: "", password: "" },
+    initialValues: { email: "", password: "" },
     validationSchema: Yup.object({
-      email: Yup.string().when("loginMethod", {
-        is: () => loginMethod === "email",
-        then: (schema) => schema.email("Invalid email").required("Email is required"),
-      }),
-      phone: Yup.string().when("loginMethod", {
-        is: () => loginMethod === "phone",
-        then: (schema) =>
-          schema.matches(/^\d{10}$/, "Phone must be 10 digits").required("Phone is required"),
-      }),
+      email: Yup.string().email("Invalid email").required("Email is required"),
       password: Yup.string().required("Password is required"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const body =
-          loginMethod === "email"
-            ? { email: values.email, password: values.password }
-            : { phone: values.phone, password: values.password };
-
-        const data = await secureFetch("/login",body)
-        if(data.code!=1){
-          throw new Error(data.message?.keyword || "Login failed")
-        }
-        // console.log("ndata",data.data.role)
-        // if (res.status !== 200) {
-        //   throw new Error(data.message?.keyword || "Login failed");
-        // }
+        const body = { email: values.email, password: values.password };
+        const data = await secureFetch("/login", body);
+        console.log('vishesh',data);
+        
+        if (data.code != 1) {
+          // throw new Error(data.message?.keyword || "Login failed");
+          toast(data.message.keyword)
+        }else{
         Cookies.set("token", data.data.token, { expires: 1, path: '/' });
-        alert("Login successful");
-        // router.push(data.data.role == "admin" ? "/admin/dashboard" : "/user/dashboard");
-        router.push('/')
+        // alert("Login successful");
+        toast.success("login successfull")
+        router.push('/');
+      }
+
       } catch (error) {
-        console.log("error in login page",error.message)
-        alert(error.message);
+        console.log("error in login page", error.message);
+       toast.error(error.message)
+        // alert(error.message);
       } finally {
         setSubmitting(false);
       }
@@ -53,92 +47,56 @@ export default function Login() {
   });
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-
-      <div className="mb-4 flex gap-4">
-        <label className="flex items-center">
-          <input
-            type="radio"
-            name="loginMethod"
-            value="email"
-            checked={loginMethod === "email"}
-            onChange={() => setLoginMethod("email")}
-            className="mr-1"
-          />
-          Email
-        </label>
-        <label className="flex items-center">
-          <input
-            type="radio"
-            name="loginMethod"
-            value="phone"
-            checked={loginMethod === "phone"}
-            onChange={() => setLoginMethod("phone")}
-            className="mr-1"
-          />
-          Phone
-        </label>
-      </div>
-
-      <form onSubmit={formik.handleSubmit} className="space-y-4">
-        {loginMethod === "email" && (
+    <Card className="max-w-md mx-auto mt-10 bg-base shadow-md border-softPink">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-center text-accent">Login</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           <div>
-            <input
-              type="email"
+            <Label htmlFor="email" className="text-deepNavy mb-3">Email</Label>
+            <Input
+              id="email"
               name="email"
-              placeholder="Email"
+              type="email"
+              placeholder="Enter your email"
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full p-2 border rounded"
+              className="w-full border-softPink focus:ring-accent text-gray-500 bg-base "
             />
             {formik.touched.email && formik.errors.email && (
-              <div className="text-red-500 text-sm">{formik.errors.email}</div>
+              <div className="text-red-600 text-sm mt-1">{formik.errors.email}</div>
             )}
           </div>
-        )}
 
-        {loginMethod === "phone" && (
           <div>
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone"
-              value={formik.values.phone}
+            <Label htmlFor="password" className="text-deepNavy mb-3">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              value={formik.values.password}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full p-2 border rounded"
+              className="w-full border-softPink focus:ring-accent text-gray-600 bg-base"
             />
-            {formik.touched.phone && formik.errors.phone && (
-              <div className="text-red-500 text-sm">{formik.errors.phone}</div>
+            {formik.touched.password && formik.errors.password && (
+              <div className="text-red-600 text-sm mt-1">{formik.errors.password}</div>
             )}
           </div>
-        )}
 
-        <div>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full p-2 border rounded"
-          />
-          {formik.touched.password && formik.errors.password && (
-            <div className="text-red-500 text-sm">{formik.errors.password}</div>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          disabled={formik.isSubmitting}
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-blue-300"
-        >
-          {formik.isSubmitting ? "Logging in..." : "Login"}
-        </button>
-      </form>
-    </div>
+          <Button
+            type="submit"
+            disabled={formik.isSubmitting}
+            className="w-full bg-accent text-base hover:bg-softPink disabled:bg-softPink/50 disabled:text-base/70"
+          >
+            {formik.isSubmitting ? "Logging in..." : "Login"}
+          </Button>
+        </form>
+        <p className="text-gray-500 text-center mt-3">Create Account,<Link href='signup' className="text-blue-500 ml-0.5 underline">Sign-Up</Link></p>
+      </CardContent>
+    </Card>
   );
 }

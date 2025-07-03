@@ -415,4 +415,195 @@ async bookmark(event_id, user_id) {
         };
     }
 }
+async createEvent (requestData,user_id){
+    try {
+        // console.log(requestData)
+            let insertQuery = `insert into tbl_event set ?`
+    //         `    INSERT INTO tbl_product (category_id, product_name, price, description, image)
+    //     VALUES (?, ?, ?, ?, ?)
+    //   `;
+            let eventData = {
+                user_id: user_id,
+                event_title: requestData.event_title,
+                start_time: requestData.start_time,
+                end_time:requestData.end_time,
+                city:requestData.city,
+                category:requestData.category,
+                description:requestData.description,
+                cover_image:requestData.cover_image,
+                tips:requestData.tips,
+                cultural_significance:requestData.cultural_significance,
+                location:requestData.location,
+               
+               
+            }
+            let [response] = await db.query(insertQuery,[eventData])
+            // console.log(insertQuery);
+            
+            // console.log(response);
+            
+            if(response.affectedRows!=0){
+                 return({
+                    code:responsecode.SUCCESS,
+                    message:{keyword:"txt_event_created_successfully"},
+                    data:null,
+                    status:200
+                 })
+            }else{
+                    return({
+                        code:responsecode.OPERATION_FAILED,
+                        message:{keyword:"txt_failed_to_add_event"},
+                        data:null,
+                        status:202
+                    })
+            }
+        } catch (error) {
+            console.log("modle error",error.message)
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:null,
+                status:500
+            })
+        }
+    }
+    async getBookmarkedEvents(user_id){
+        try {
+            // console.log(user_id);
+            
+            let Selectquery = `SELECT e.*
+FROM tbl_event e
+JOIN tbl_event_bookmark eb
+  ON e.id = eb.event_id
+WHERE eb.user_id = ?
+  AND eb.is_bookmarked = 1
+  AND eb.is_deleted = 0
+  AND eb.is_active = 1;`
+            let [responsee]  = await db.query(Selectquery,[user_id]) 
+            let response = responsee
+            // console.log(response);
+            
+           if(response){
+            // let eventData = await this.displayEvent(response)
+            return ({
+                code:responsecode.SUCCESS,
+                message:{keyword:"bookmark found"},
+                data: response ,
+                status:200
+            })
+        }else{
+            return ({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"hello hello"},
+                data: null,
+                status:300
+            })
+        }
+        } catch (error) {
+            console.log('server error',error.message);
+            
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:null,
+                status:500
+            })
+        }
+    }
+
+    async getsubmitted(user_id){
+        try {
+            console.log(user_id);
+            
+            let Selectquery = `SELECT e.*
+FROM tbl_event e
+JOIN tbl_user u ON e.user_id = u.id
+WHERE u.role = 'user'and u.id=?;`
+            let [responsee]  = await db.query(Selectquery,[user_id]) 
+            let response = responsee
+            console.log(response);
+            
+           if(response){
+            // let eventData = await this.displayEvent(response)
+            return ({
+                code:responsecode.SUCCESS,
+                message:{keyword:"bookmark found"},
+                data: response ,
+                status:200
+            })
+        }else{
+            return ({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"hello hello"},
+                data: null,
+                status:300
+            })
+        }
+        } catch (error) {
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:null,
+                status:500
+            })
+        }
+    }
+async searchEvent(searchTerm){
+    try {
+        // console.log("search term",searchTerm);
+        let selectQuery = `SELECT * FROM tbl_event WHERE is_active=1 AND is_deleted=0`;
+        let params = [];
+
+        if (searchTerm.event_title) {
+            selectQuery += ` AND event_title LIKE ?`;
+            params.push(`%${searchTerm.event_title}%`);
+        }
+
+        if (searchTerm.category) {
+            selectQuery += ` AND category = ?`;
+            params.push(searchTerm.category);
+        }
+
+        if (searchTerm.city) {
+            selectQuery += ` AND city = ?`;
+            params.push(searchTerm.city);
+        }
+
+        // console.log("Final SQL Query:", selectQuery);
+        // console.log("With Params:", params);
+// 
+        let [response] = await db.query(selectQuery, params);
+        // console.log("Search Result:", response);
+    //    console.log("Final SQL Query:", selectQuery);
+    //    console.log("Search Term Passed:", `%${searchTerm.event_title}%`);
+       
+       if(response){
+        // console.log("search displayed",response[0]);
+return({
+    
+    
+    code:responsecode.SUCCESS,
+    message:{keyword:"txt_event_fetched"},
+    data:response,
+    status:200
+})
+
+       }else{
+        return({
+            code:responsecode.OPERATION_FAILED,
+            message:{keyword:"txt_event_not_found"},
+            data:null,
+            status:300
+        })
+       }
+    } catch (error) {
+        console.log("modle error",error.message)
+        return({
+            code:responsecode.SERVER_ERROR,
+            message:{keyword:"txt_server_error"},
+            data:null,
+            status:500
+        })
+    }
+}
 }module.exports = new UserModel();
