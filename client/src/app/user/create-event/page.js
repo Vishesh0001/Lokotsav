@@ -8,15 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
-  AlertDialogAction,
- 
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -36,7 +34,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function AddEvent() {
-  
+  const[openDialog,setOpenDialog]= useState(false)
 // const[loading,setloading]=useState(true)
   const formik = useFormik({
     initialValues: {
@@ -52,9 +50,9 @@ export default function AddEvent() {
       location: '',
     },
     validationSchema,
-     validateOnMount: true,
-validateOnChange: true,
-validateOnBlur: true,
+  
+
+
     onSubmit: async (values, { resetForm }) => {
       // setloading(false)
       try {
@@ -63,9 +61,9 @@ validateOnBlur: true,
         if (res.code ==1) {
           resetForm();
          toast.success('Event created!')
-      // setloading(false)
+      setOpenDialog(true)
         } else {
-          toast.error(res.message)
+          toast.error(res.message.keyword)
           return;
         }
       } catch (error) {
@@ -149,10 +147,19 @@ validateOnBlur: true,
             className="w-full p-2 border border-softPink rounded focus:ring-accent bg-base text-gray-500"
           >
             <option value="">Select Category</option>
-            <option value="local">Local</option>
-            <option value="festival">Festival Event</option>
-            <option value="cultural">Cultural Event</option>
-            <option value="traditional">Traditional Event</option>
+         <option value="Local Events">Local Events</option>
+<option value="Cultural Festivals">Cultural Festivals</option>
+<option value="Religious Festivals">Religious Festivals</option>
+<option value="Dance & Music">Dance & Music</option>
+<option value="Art & Craft">Art & Craft</option>
+<option value="Food & Culinary">Food & Culinary</option>
+<option value="Business & Networking">Business & Networking</option>
+<option value="Comedy Shows">Comedy Shows</option>
+<option value="Workshops & Performances">Workshops & Performances</option>
+<option value="Conferences & Exhibitions">Conferences & Exhibitions</option>
+<option value="Hobbies">Hobbies</option>
+<option value="Nightlife">Nightlife</option>
+
           </select>
           {formik.errors.category && <p className="text-red-500 mt-2 text-sm">{formik.errors.category}</p>}
         </div>
@@ -169,7 +176,7 @@ validateOnBlur: true,
           {formik.errors.description && <p className="text-red-500 mt-2 text-sm">{formik.errors.description}</p>}
         </div>
 
-        {/* <div>
+        <div>
           <Label htmlFor="cover_image" className="text-accent">Cover Image URL</Label>
           <Input
             id="cover_image"
@@ -180,7 +187,7 @@ validateOnBlur: true,
             className="w-full text-gray-500 border-softPink focus:ring-accent"
           />
           {formik.errors.cover_image && <p className="text-red-500 mt-2 text-sm">{formik.errors.cover_image}</p>}
-        </div> */}
+        </div>
 
         <div>
           <Label htmlFor="tips" className="text-deepNavy mb-2">Tips</Label>
@@ -219,29 +226,33 @@ validateOnBlur: true,
           {formik.errors.location && <p className="text-red-500 mt-2 text-sm">{formik.errors.location}</p>}
         </div>
 
-        
-        <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button disabled={!formik.isValid || formik.isSubmitting } type="submit" className="w-full bg-accent text-base hover:bg-softPink">
-          Submit
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Event created successfully</AlertDialogTitle>
-          <AlertDialogDescription>
-            Your Event would be visible on Lokostav once the admin approves the Event
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Link href='/user/dashboard'>
-           <AlertDialogAction>Go to Personal Dashboard</AlertDialogAction>
-           </Link>
-           <Link href='/'>
-          <AlertDialogAction>Go to Home</AlertDialogAction></Link>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      <Button
+        type="submit"
+        className="w-full bg-accent text-base hover:bg-softPink"
+        disabled={!formik.isValid || formik.isSubmitting}
+      >
+        Submit
+      </Button>
+
+
+      <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Event created successfully</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your event will be visible on Lokostav once approved.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Link href="/user/dashboard">
+              <Button>Go to Personal Dashboard</Button>
+            </Link>
+            <Link href="/">
+              <Button>Go to Home</Button>
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </form>
     </div>
   );

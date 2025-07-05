@@ -71,7 +71,7 @@ class User{
       }
     async getEvent(req,res){
         try {
-          console.log('req body ',req.body);
+          // console.log('req body ',req.body);
           
           let event_id = await common.decodeBody(req.body)
           console.log('event_id',event_id);
@@ -195,6 +195,48 @@ class User{
           
         }
       }
+       async getApprovedEvents(req,res){
+  try {
+    // let event_id = await common.decodeBody(req.body)
+    // let event_id = req.body
+    // console.log("searchtrerm",searchTerm);
+    // console.log("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.approvedEvents(user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+    
+  }
+ }
+ async getUnApprovedEvents(req,res){
+   try {
+      const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.UnapprovedEvents(user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+    
+  }
+ }
+ async getcategory(req,res){
+        try {
+          // console.log('req body ',req.body);
+          
+          let request_data = await common.decodeBody(req.body)
+          // console.log('event_id',event_id);
+          
+          let response = await userModel.category(request_data)
+          common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+        } catch (error) {
+          console.log("controller eror",error.message)
+          common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+          
+        }
+ }
       }
     
     module.exports = new User();

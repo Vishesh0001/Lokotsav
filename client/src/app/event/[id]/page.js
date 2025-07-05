@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import secureFetch from "@/utils/securefetch"
 import Link from "next/link";
 import { Ticket } from "lucide-react";
+import { toast } from "sonner";
 export default async function event({params}) {
 const {id} = await params;
 let resdata;
@@ -13,16 +14,20 @@ try {
     
     if(response.code==1){
          resdata = await response.data
-        
+        if(response.data.length==0){
+          return(<p>no such event</p>)
+        }
     }
 } catch (error) {
+
+  return(<p className="text-center text-red ">no such event</p>);
     throw new Error(`${error.message}`)
 }
 
 
 return(
    <div className="flex  justify-center h-screen  p-6">
-  <div className="w-auto h-180 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+  <div className="w-150 h-180 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
     <img
       src={resdata.cover_image}
       alt="event image"

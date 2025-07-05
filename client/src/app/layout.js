@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 import { Toaster } from "sonner";
+import Footer from "@/components/Footer";
 
 
 export const metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
      <Toaster offset={80}
   position="top-center"
 />
+<Footer/>
        </body>
     
     </html>

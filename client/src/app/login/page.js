@@ -24,13 +24,14 @@ export default function Login() {
       try {
         const body = { email: values.email, password: values.password };
         const data = await secureFetch("/login", body);
-        console.log('vishesh',data);
+        // console.log('vishesh',data);
         
         if (data.code != 1) {
           // throw new Error(data.message?.keyword || "Login failed");
           toast(data.message.keyword)
         }else{
-        Cookies.set("token", data.data.token, { expires: 1, path: '/' });
+          const tokenExpiry = new Date(Date.now() + 5 * 60*60 * 60 * 1000); // 1 hour
+        Cookies.set("token", data.data.token, { expires: tokenExpiry, path: '/' });
         // alert("Login successful");
         toast.success("login successfull")
         router.push('/');

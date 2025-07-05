@@ -51,7 +51,7 @@ class Common{
     return jwt.sign(
       { id: Id, r },
       process.env.JWT_SECRET || 'vishesh456',
-      { expiresIn: '4h' }
+      { expiresIn: '1d' }
     );
   }
   async storeToken(userId,token){

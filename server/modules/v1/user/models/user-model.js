@@ -170,9 +170,9 @@ const bcrypt = require("bcrypt");
 async logout(userId){
     try {
        console.log("entered logout")
-        let updatequery =`update tbl_user set is_login= 0 where id=?`
-        let response  = await db.query(updatequery,userId)
-        if(response.affectedRows!=0){
+        // let updatequery =`update tbl_user set is_login= 0 where id=?`
+        // let response  = await db.query(updatequery,userId)
+        // if(response.affectedRows!=0){
          let tokenresponse = await common.removeToken(userId)
          if(tokenresponse){
             console.log("logged out");
@@ -196,16 +196,16 @@ async logout(userId){
                 status:400
             })
          }
-        }else{
-            return({
-                code:responsecode.OPERATION_FAILED,
-                message:{
-                    keyword:"txt_logout_failed"
-                },
-                data:null,
-                status:400
-            })
-        }
+        // }else{
+        //     return({
+        //         code:responsecode.OPERATION_FAILED,
+        //         message:{
+        //             keyword:"txt_logout_failed"
+        //         },
+        //         data:null,
+        //         status:400
+        //     })
+        // }
     } catch (error) {
         console.log("server eror in model",error.message)
         return({
@@ -604,6 +604,113 @@ return({
             data:null,
             status:500
         })
+    }
+}
+async approvedEvents(user_id){
+         try {
+            // console.log(user_id);
+            
+            let Selectquery = `select id,event_title, category, start_time,end_time,city,cover_image,cultural_significance,tips,description,location,registrations from tbl_event where user_id= ? and is_active=1 and is_deleted=0 and is_approved=1;`
+            let [responsee]  = await db.query(Selectquery,[user_id]) 
+            let response = responsee
+            // console.log(response);
+            
+           if(response){
+            // let eventData = await this.displayEvent(response)
+            return ({
+                code:responsecode.SUCCESS,
+                message:{keyword:"approved events found"},
+                data: response ,
+                status:200
+            })
+        }else{
+            return ({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"events not found"},
+                data: null,
+                status:300
+            })
+        }
+        } catch (error) {
+            console.log('server error',error.message);
+            
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:null,
+                status:500
+            })
+        }
+}
+async UnapprovedEvents(user_id){
+         try {
+            // console.log(user_id);
+            
+            let Selectquery = `select id,event_title, category, start_time,city,cover_image,description,location,registrations from tbl_event where user_id= ? and is_active=1 and is_deleted=0 and is_approved=0;`
+            let [responsee]  = await db.query(Selectquery,[user_id]) 
+            let response = responsee
+            // console.log(response);
+            
+           if(response){
+            // let eventData = await this.displayEvent(response)
+            return ({
+                code:responsecode.SUCCESS,
+                message:{keyword:"unapproved events found"},
+                data: response ,
+                status:200
+            })
+        }else{
+            return ({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"events not found"},
+                data: null,
+                status:300
+            })
+        }
+        } catch (error) {
+            console.log('server error',error.message);
+            
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:null,
+                status:500
+            })
+        }
+}
+async category(request_data){
+    try {
+        // console.log(request_data);
+        
+        const selectQuery = `select id,category,event_title,cover_image,start_time,description,city,location,is_featured,registrations from tbl_event where is_active=1 and is_deleted=0 and is_approved=1 and category=?`
+        const [response] =await db.query(selectQuery,[request_data.v])
+        if(response){
+            // console.log(response);
+            
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'category found'},
+                data:response,
+                status:200
+            })
+        }else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:'category not found'},
+                data:null,
+                status:300
+            })
+        }
+
+    } catch (error) {
+         console.log('server error',error.message);
+            
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:null,
+                status:500
+            })
     }
 }
 }module.exports = new UserModel();
