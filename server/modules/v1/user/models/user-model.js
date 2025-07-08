@@ -2,6 +2,8 @@ const db = require("../../../../config/database");
 const common = require("../../../../utilities/common");
 const responsecode = require("../../../../utilities/response-error-code")
 const bcrypt = require("bcrypt");
+const user = require("../controller/user");
+const messages = require("../../../../../../New folder (4)/NodeStrcutureDemo/language/en");
 
  class UserModel{
         async signup(request_data){ 
@@ -12,12 +14,11 @@ const bcrypt = require("bcrypt");
             
             const checkUniqueEmail = await common.checkEmail(request_data.email)
             if(!checkUniqueEmail){
-              const checkUniquePhone = await common.checkPhone(request_data.phone)
-              if(!checkUniquePhone){
+            
                 const hashedPassword = await bcrypt.hash(request_data.password, 10);
                 const userData = {
                     username : request_data.username,
-                    phone: request_data.phone,
+                    
                     email:request_data.email,
                     password: hashedPassword
                 }
@@ -33,21 +34,23 @@ const bcrypt = require("bcrypt");
                         status:400
                     })
                 }else{
-                    return({
+                    const userId = queryResponse.insertId
+                    const otp = common.generateOTP()
+                    const otpData={
+                        user_id:userId,
+                        otp: otp
+                    }
+                    //**********send maill */
+                    const insertQuery =`insert into tbl_otp set?`;
+                    const [otpres] = await db.query(insertQuery,[otpData])
+                    if(otpres.affectedRows >= 1){
+                         return({
                           code:responsecode.SUCCESS,
                           message:{keyword:"txt_signup_success"},
                           data:queryResponse.insertId,
                           status:200
-                    })
+                    })}
                 }
-              }else{
-                return ({
-                    code: responsecode.OPERATION_FAILED,
-                    message: {keyword:"txt_phone_already_exists"},
-                    data : null,
-                    status:400
-                })
-              }
             }else{
                 return ({
                     code: responsecode.OPERATION_FAILED,
@@ -66,20 +69,120 @@ const bcrypt = require("bcrypt");
             })
         }
     }
+    async verifyOTP(request_data) {
+    try {
+        console.log(request_data);
+        
+        const otp  = request_data.otp;
+
+        // Step 1: Fetch user_id using phone_number
+        const userQuery = "SELECT user_id FROM tbl_otp WHERE otp = ?";
+        const [userResult] = await db.query(userQuery, [otp]);
+
+        if (userResult.length == 0) {
+            return {
+                code: responsecode.OTP_NOT_VERIFIED,
+                message: { keyword: "Wrong OTP Entered" },
+                data: null,
+                status: 300
+            };
+        }else{
+    const user_id = userResult[0].user_id;
+    const checkuser = 'select is_verified from tbl_user where is_active=1 and is_deleted = 0 and id= ? '
+    const [userresult] = await db.query (checkuser,user_id)
+if(userResult[0].is_verified==1){
+    return ({
+        code: responsecode.OPERATION_FAILED,
+        message:{keyword:' Already Verified user'},
+        data:null,
+        status:300
+
+    })
+}else{
+    //  Update user as verified
+        const updateUserQuery = "UPDATE tbl_user SET is_verified = 1 WHERE id = ?";
+        await db.query(updateUserQuery, [user_id]);
+        // Deactivate OTP
+        const deactivateOtpQuery = "UPDATE tbl_otp SET is_active = 0 WHERE user_id = ?";
+        await db.query(deactivateOtpQuery, [user_id]);
+                 let role = 'user'
+               let generatedToken = common.generateToken(user_id,role)
+                              let tokenresponse = await common.storeToken(user_id,generatedToken)
+                              if(tokenresponse)
+{    return({
+code: responsecode.SUCCESS,
+            message: { keyword: "otp_verified_successfully" },
+            data: {
+                user_id,
+               toke: generatedToken
+            },
+            status: 200
+    })}
+}
+        }
+
+    
+
+        // Step 2: Verify OTP
+        const otpQuery = "SELECT * FROM tbl_otp WHERE user_id = ? AND otp = ? AND is_active = 1";
+        const [otpResult] = await db.query(otpQuery, [user_id, otp]);
+
+        if (otpResult.length === 0) {
+            return {
+                code: responseCode.OTP_NOT_VERYFIED,
+                message: { keyword: "login_invalid_credential" },
+                data: null,
+                status: 401
+            };
+        }
+
+        // Step 3: Update user as verified
+        const updateUserQuery = "UPDATE tbl_user SET is_verified = 1 WHERE id = ?";
+        await db.query(updateUserQuery, [user_id]);
+
+        // Step 4: Deactivate OTP
+        const deactivateOtpQuery = "UPDATE tbl_otp SET is_active = 0 WHERE user_id = ?";
+        await db.query(deactivateOtpQuery, [user_id]);
+
+        // Optional Step 5: Generate JWT token
+        const jwt = require("jsonwebtoken");
+        const token = jwt.sign(
+            { user_id: user_id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        return {
+            code: responseCode.SUCCESS,
+            message: { keyword: "otp_verified_successfully" },
+            data: {
+                user_id,
+                token
+            },
+            status: 200
+        };
+
+    } catch (error) {
+        console.error("Error in verifyOTP:", error);
+        return {
+            code: responsecode.OPERATION_FAILED,
+            message: { keyword: "internal_server_error" },
+            data: error.message,
+            status: 500
+        };
+    }
+}
+
     async login(request_data){
       
       try{
-        let field = 'email'
-        let dataas = request_data.email
-       if(request_data.email==null){
-        field = 'phone'
-        dataas = request_data.phone;
-       }
+        let email =  request_data.email
+
     //    let data= request_data.${field}
-        let selectQuery= `select id,role,email , password,is_active,is_deleted from tbl_user where ${field} = ?`
+        let selectQuery= `select id,role,email , password,is_active,is_deleted from tbl_user where email = ?`
         // console.log("query",selectQuery);
         
-        const [response] = await db.query(selectQuery,dataas)
+        const [response] = await db.query(selectQuery,email)
         // console.log("res",response);
         
         let userInfo = response[0];
@@ -121,14 +224,6 @@ const bcrypt = require("bcrypt");
                             status:401
                         })
                     }
-                // }else{
-                //     return ({
-                //         code :responsecode.OPERATION_FAILED,
-                //         message:{keyword:"txt_already_loggedin"},
-                //         data:null,
-                //         status:401
-                //     })
-                // }
                  }else{
                     // user deleted account signup again
                     return ({
@@ -550,27 +645,22 @@ WHERE u.role = 'user'and u.id=?;`
     }
 async searchEvent(searchTerm){
     try {
-        // console.log("search term",searchTerm);
-        let selectQuery = `SELECT * FROM tbl_event WHERE is_active=1 AND is_deleted=0`;
+        console.log("search term",searchTerm);
+        let selectQuery = `SELECT * FROM tbl_event WHERE is_active=1 AND is_deleted=0 and is_approved=1`;
         let params = [];
 
-        if (searchTerm.event_title) {
-            selectQuery += ` AND event_title LIKE ?`;
-            params.push(`%${searchTerm.event_title}%`);
-        }
+    if (searchTerm.s) {
+  selectQuery += ` AND LOWER(event_title) LIKE ?`;
+  params.push(`%${searchTerm.s.toLowerCase()}%`);
+}
+if (searchTerm.city) {
+  selectQuery += ` AND LOWER(city) = ?`;
+  params.push(searchTerm.city.toLowerCase());
+}
 
-        if (searchTerm.category) {
-            selectQuery += ` AND category = ?`;
-            params.push(searchTerm.category);
-        }
 
-        if (searchTerm.city) {
-            selectQuery += ` AND city = ?`;
-            params.push(searchTerm.city);
-        }
-
-        // console.log("Final SQL Query:", selectQuery);
-        // console.log("With Params:", params);
+        console.log("Final SQL Query:", selectQuery);
+        console.log("With Params:", params);
 // 
         let [response] = await db.query(selectQuery, params);
         // console.log("Search Result:", response);

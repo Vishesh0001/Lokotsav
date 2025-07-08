@@ -6,11 +6,12 @@ const router = express.Router();
 // router.post("/upload",upload.single('image'), userController.uploadImage);
 router.post("/signup",userController.signUp)
 router.post("/login",userController.login)
+router.post('/verifyotp',userController.verifyOTP)
 router.get("/logout",userController.logout)
 router.get("/events",userController.getEvents)
 router.post("/event",userController.getEvent)
 router.get("/featuredEvents",userController.getFeaturedEvents)
-router.post("/searchterm",userController.searchEvent) //city and search
+router.post("/searchevents",userController.searchEvent) //city and search
 router.post("/bookmark",userController.bookmark)
 router.post("/getbookmark",userController.getBookmarkStatus)
 router.post("/create-event",userController.createEvent)

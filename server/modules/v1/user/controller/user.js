@@ -45,6 +45,16 @@ class User{
       return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
         }
       }
+      async verifyOTP(req,res){
+        try {
+          const otp = await req.body
+          const response = await userModel.verifyOTP(otp)
+          res.send(response)
+        } catch (error) {
+          console.log(error);
+          
+        }
+      }
       async logout(req,res){
         try {
           let userId = await common.getUserIdFromToken(req)

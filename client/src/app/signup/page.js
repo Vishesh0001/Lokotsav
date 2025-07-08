@@ -45,7 +45,7 @@ export default function Signup() {
           alert(`${response.message.keyword}`);
         } else {
           alert("Signup successful");
-          router.push('/login');
+          router.push('/verify-otp');
         }
       } catch (err) {
         alert(`${err.message}`);

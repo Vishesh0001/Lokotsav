@@ -30,7 +30,7 @@ export default function Login() {
           // throw new Error(data.message?.keyword || "Login failed");
           toast(data.message.keyword)
         }else{
-          const tokenExpiry = new Date(Date.now() + 5 * 60*60 * 60 * 1000); // 1 hour
+          const tokenExpiry = new Date(Date.now() +  5 * 60 * 1000); // 5mins   hour
         Cookies.set("token", data.data.token, { expires: tokenExpiry, path: '/' });
         // alert("Login successful");
         toast.success("login successfull")
