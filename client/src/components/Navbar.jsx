@@ -47,7 +47,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-base shadow-md border-b border-softGray backdrop-blur-md px-4 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 z-50 bg-base shadow-md border-b border-softGray backdrop-blur-md px-4 py-1 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 py-2">
   
         <div className="flex items-center space-x-3">
@@ -61,7 +61,7 @@ export default function Navbar() {
 
         <form
           onSubmit={handleSearch}
-          className="flex flex-wrap items-center gap-1 px-2 py-1 rounded-full border border-gray-300 transition hover:shadow-md hover:border-pink-400"
+          className="flex flex-wrap items-center gap-1 px-2 py-2 rounded-full border border-gray-300 transition hover:shadow-md hover:border-pink-400"
         >
           <Input
             placeholder="Search events..."

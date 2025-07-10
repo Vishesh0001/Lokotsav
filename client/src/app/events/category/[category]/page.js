@@ -107,7 +107,7 @@ return(<div>something went wrong</div>)
         </div>
         <div className="flex items-center space-x-2">
           <BookmarkButton event_id={event.id} />
-          <Link href={`event/${event.id}`}>
+          <Link href={`/event/${event.id}`}>
             <button className="text-xs font-semibold text-white bg-accent hover:bg-accent/80 px-3 py-1.5 rounded-md transition-colors duration-200">
               View Details
             </button>

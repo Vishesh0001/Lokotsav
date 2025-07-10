@@ -9,12 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
 
 const SignupSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
-  phone: Yup.string()
-    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
-    .required('Phone is required'),
+
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string()
     .min(6, 'Password must be at least 6 characters')
@@ -31,7 +30,7 @@ export default function Signup() {
   const formik = useFormik({
     initialValues: {
       username: '',
-      phone: '',
+   
       email: '',
       password: '',
       confirmpassword: '',
@@ -42,15 +41,18 @@ export default function Signup() {
       try {
         const response = await secureFetch('/signup', { ...values }, 'POST');
         if (response.code != 1) {
-          alert(`${response.message.keyword}`);
+          toast.warning(response.message.keyword)
+      
         } else {
-          alert("Signup successful");
+       toast.success("sign-up successfull!")
           router.push('/verify-otp');
+           toast('OTP sent to entered Email')
         }
       } catch (err) {
-        alert(`${err.message}`);
+        toast.error(err.message)
       } finally {
         setLoading(false);
+       
       }
     },
   });
@@ -75,26 +77,11 @@ export default function Signup() {
               className="w-full border-softPink focus:ring-accent text-gray-600 bg-base"
             />
             {formik.touched.username && formik.errors.username && (
-              <div className="text-softPink text-sm mt-1">{formik.errors.username}</div>
+              <div className="text-red-500 text-sm mt-1">{formik.errors.username}</div>
             )}
           </div>
 
-          <div>
-            <Label htmlFor="phone" className="text-deepNavy mb-2">Phone Number</Label>
-            <Input
-              id="phone"
-              name="phone"
-              type="text"
-              placeholder="Enter your phone number"
-              value={formik.values.phone}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full border-softPink focus:ring-accent text-gray-600 bg-base"
-            />
-            {formik.touched.phone && formik.errors.phone && (
-              <div className="text-softPink text-sm mt-1">{formik.errors.phone}</div>
-            )}
-          </div>
+
 
           <div>
             <Label htmlFor="email" className="text-deepNavy mb-2">Email Address</Label>
@@ -109,7 +96,7 @@ export default function Signup() {
               className="w-full border-softPink focus:ring-accent text-gray-600 bg-base"
             />
             {formik.touched.email && formik.errors.email && (
-              <div className="text-softPink text-sm mt-1">{formik.errors.email}</div>
+              <div className="text-red-500 text-sm mt-1">{formik.errors.email}</div>
             )}
           </div>
 
@@ -126,7 +113,7 @@ export default function Signup() {
               className="w-full border-softPink focus:ring-accent text-gray-600 bg-base"
             />
             {formik.touched.password && formik.errors.password && (
-              <div className="text-softPink text-sm mt-1">{formik.errors.password}</div>
+              <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
             )}
           </div>
 
@@ -143,7 +130,7 @@ export default function Signup() {
               className="w-full border-softPink focus:ring-accent text-gray-600 bg-base"
             />
             {formik.touched.confirmpassword && formik.errors.confirmpassword && (
-              <div className="text-softPink text-sm mt-1">{formik.errors.confirmpassword}</div>
+              <div className="text-red-500 text-sm mt-1">{formik.errors.confirmpassword}</div>
             )}
           </div>
 
@@ -152,13 +139,13 @@ export default function Signup() {
             disabled={loading}
             className="w-full bg-accent text-base hover:bg-softPink disabled:bg-softPink/50 disabled:text-base/70"
           >
-            {loading ? 'Signing up...' : 'Signup'}
-Sign-Up
+            {loading ? 'Signing up...' : 'Sign-up'}
+
           </Button>
 
           <p className="text-center text-sm text-accent">
             Already have an account?{' '}
-            <Link href="/login" className="text-softPink hover:underline">
+            <Link href="/login" className="text-blue-600 hover:underline">
               Login here
             </Link>
           </p>

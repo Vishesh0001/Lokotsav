@@ -29,7 +29,7 @@ const messages = require("../../../../../../New folder (4)/NodeStrcutureDemo/lan
                 if(queryResponse.affectedRows==0){
                     return({
                         code:responsecode.OPERATION_FAILED,
-                        message:{keyword:"txt_insertion_error"},
+                        message:{keyword:"data_insertion_error"},
                         data:null,
                         status:400
                     })
@@ -46,7 +46,7 @@ const messages = require("../../../../../../New folder (4)/NodeStrcutureDemo/lan
                     if(otpres.affectedRows >= 1){
                          return({
                           code:responsecode.SUCCESS,
-                          message:{keyword:"txt_signup_success"},
+                          message:{keyword:"signup_success"},
                           data:queryResponse.insertId,
                           status:200
                     })}
@@ -54,7 +54,7 @@ const messages = require("../../../../../../New folder (4)/NodeStrcutureDemo/lan
             }else{
                 return ({
                     code: responsecode.OPERATION_FAILED,
-                    message: {keyword:"txt_email_already_exists"},
+                    message: {keyword:"Email is already registered, you can login!"},
                     data : null,
                     status:400
                 })
@@ -75,7 +75,6 @@ const messages = require("../../../../../../New folder (4)/NodeStrcutureDemo/lan
         
         const otp  = request_data.otp;
 
-        // Step 1: Fetch user_id using phone_number
         const userQuery = "SELECT user_id FROM tbl_otp WHERE otp = ?";
         const [userResult] = await db.query(userQuery, [otp]);
 
@@ -114,7 +113,7 @@ code: responsecode.SUCCESS,
             message: { keyword: "otp_verified_successfully" },
             data: {
                 user_id,
-               toke: generatedToken
+               token: generatedToken
             },
             status: 200
     })}
@@ -179,7 +178,7 @@ code: responsecode.SUCCESS,
         let email =  request_data.email
 
     //    let data= request_data.${field}
-        let selectQuery= `select id,role,email , password,is_active,is_deleted from tbl_user where email = ?`
+        let selectQuery= `select id,role,email , password,is_active,is_deleted,is_verified from tbl_user where email = ?`
         // console.log("query",selectQuery);
         
         const [response] = await db.query(selectQuery,email)
@@ -191,7 +190,7 @@ code: responsecode.SUCCESS,
         if(userInfo){
               if(userInfo.is_active==1){
                  if(userInfo.is_deleted==0){
-                    // if(userInfo.is_login == 0){
+                    if(userInfo.is_verified == 1){
                     const isMatch = await bcrypt.compare(request_data.password, userInfo.password);
                     if (isMatch){
                               let role = userInfo.role
@@ -202,7 +201,7 @@ code: responsecode.SUCCESS,
                             //    await common.updateLoginFlag(id)
                                 return ({
                                     code :responsecode.SUCCESS,
-                                    message:{keyword:"txt_login_success"},
+                                    message:{keyword:"login successfull"},
                                     data:{token:generatedToken,role:role},
                                     status:200
                                 })
@@ -210,7 +209,7 @@ code: responsecode.SUCCESS,
                                 //token genertation errro
                                 return ({
                                     code :responsecode.CODE_NULL,
-                                    message:{keyword:"txt_token_error"},
+                                    message:{keyword:"token error"},
                                     data:null,
                                     status:401
                                 })
@@ -219,16 +218,24 @@ code: responsecode.SUCCESS,
                         // invalid credentials
                         return ({
                             code :responsecode.UNAUTHORIZED,
-                            message:{keyword:"txt_invalid_credentials"},
+                            message:{keyword:"invalid credentials"},
                             data:null,
                             status:401
                         })
                     }
+                }else{
+                    return({
+                        code:responsecode.OTP_NOT_VERIFIED,
+                        message:{keyword:"Email not verified!"},
+                        data:null,
+                        status:300
+                    })
+                }
                  }else{
                     // user deleted account signup again
                     return ({
                         code :responsecode.NOT_REGISTER,
-                        message:{keyword:"txt_account_deleted"},
+                        message:{keyword:"this account is already deleted"},
                         data:null,
                         status:401
                     })
@@ -236,7 +243,7 @@ code: responsecode.SUCCESS,
               }else{//userblocked
                 return ({
                     code :responsecode.INACTIVE_ACCOUNT,
-                    message:{keyword:"txt_user_blocked"},
+                    message:{keyword:"This user has been blocked"},
                     data:null,
                     status:401
                 })
@@ -245,7 +252,7 @@ code: responsecode.SUCCESS,
             // user not fount or signup required
             return ({
                 code :responsecode.NOT_REGISTER,
-                message:{keyword:"txt_user_not_registered"},
+                message:{keyword:"User not registered,sign-up first!"},
                 data:null,
                 status: 401
             })

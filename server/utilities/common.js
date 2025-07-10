@@ -47,9 +47,8 @@ class Common{
       return {};
     }
   }
-  generateOTP(length = 4){
-    return Math.floor(1000 + Math.random() * 9000);
-    //return "1234";
+generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000); // generates between 100000 and 999999
 }
   generateToken (Id, r) {
     return jwt.sign(
@@ -123,19 +122,7 @@ res.status(status).send(encryptedData)
     }
   }
 
-  async checkPhone(mobile_number) {
-    try {
-        let sql = "SELECT id FROM tbl_user WHERE phone = ? AND is_active = 1 AND is_deleted = 0 ";
-        const [results] = await db.query(sql, [mobile_number]);
-        if(results.length >  0){
-            return true;
-        } else{
-            return false;
-        }
-    } catch (error) {
-        throw error;
-    }
-}
+
 async removeToken(userId){
 try{ 
   let updateQuery = `update tbl_device set is_active=0,is_deleted =1 where user_id = ?`

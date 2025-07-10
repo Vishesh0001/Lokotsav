@@ -3,6 +3,7 @@
 import { encrypt } from "@/utils/crypto";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Logout() {
   const router = useRouter();
@@ -28,14 +29,14 @@ console.log(response);
         Cookies.remove('token', { path: '/' });
         // console.log('After logout:', Cookies.get('token'));
         //  Cookies.remove("token",{path:'/'});
-        alert("Logout successful");
+       toast.success('logout success!')
         router.push("/login");
       } else {
-        alert(response.message?.keyword || "Logout failed");
+       toast.warning(response.message.keyword)
       }
     } catch (error) {
       console.error("Logout error:", error);
-      alert(`Logout failed`);
+     toast.error(error.message)
     }
   }
 

@@ -7,16 +7,16 @@ let  ValidationSchema={
  joi.object({
     username: joi.string().required(),
     email: joi.string().email().required().label('Email'),
-    phone: joi.string().pattern(/\d/).required().label('Phone Number'),
+
     password: joi.string().min(3).max(30).required().label('Password'),
     confirmpassword: joi.string().required().label('confirmpassword')
              }),
  
 loginSchema : joi.object({
    email: joi.string().email().label('Email'),
-   phone: joi.string().pattern(/^\d+$/).label('Phone Number'),
+
    password: joi.string().min(3).max(30).required().label('password'),
- }).xor('email', 'phone'),    
+ }),   
 
  event:joi.object({
    // user_id: joi.number().required(), 

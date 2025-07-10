@@ -23,18 +23,24 @@ export default function Login() {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const body = { email: values.email, password: values.password };
-        const data = await secureFetch("/login", body);
+        const resposne = await secureFetch("/login", body);
         // console.log('vishesh',data);
         
-        if (data.code != 1) {
+        if (resposne.code != 1) {
           // throw new Error(data.message?.keyword || "Login failed");
-          toast(data.message.keyword)
+          toast.warning(data.message.keyword)
+          if(resposne.code == 4){
+            router.push('/verify-otp')
+          }
         }else{
           const tokenExpiry = new Date(Date.now() +  5 * 60 * 1000); // 5mins   hour
-        Cookies.set("token", data.data.token, { expires: tokenExpiry, path: '/' });
+        Cookies.set("token", resposne.data.token, { expires: tokenExpiry, path: '/' });
         // alert("Login successful");
         toast.success("login successfull")
-        router.push('/');
+        if(resposne.data.role=='admin'){router.push('/admin/dashboard')}
+       else{
+        router.push('/');}
+        toast.success('Welcome to Lokotsav!')
       }
 
       } catch (error) {

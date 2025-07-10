@@ -2,17 +2,31 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 export default function VerifyOtpPage() {
   const [otp, setOtp] = useState('');
+  // const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (otp.length !== 6) {
+toast.warning('Enter OTP of 6 digits')
+      return;
+    }
+
+    // setErrorMsg('');
     setLoading(true);
-    setErrorMsg('');
 
     try {
       const res = await fetch('http://localhost:5000/v1/user/verifyotp', {
@@ -20,22 +34,25 @@ export default function VerifyOtpPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ otp }), // Add user_id or phone if needed
+        body: JSON.stringify({ otp }),
       });
 
       const result = await res.json();
 
-      if (result.code === '1' && result.data?.toke) {
-        // Save token to localStorage
-        localStorage.setItem('token', result.data.toke);
-        // Redirect to home
+      if (result.code ==1) {
+                 const tokenExpiry = new Date(Date.now() +  5 * 60 * 1000); // 5mins   hour
+               Cookies.set("token", result.data.token, { expires: tokenExpiry, path: '/' });
+               toast.success('verification completed')
         router.push('/');
+        toast('welcome to Lokotsav')
       } else {
-        setErrorMsg('Invalid OTP. Please try again.');
+        toast.error('Invalid OTP. Please try again.')
+        // setErrorMsg('Invalid OTP. Please try again.');
       }
     } catch (error) {
-      console.error('OTP verification error:', error);
-      setErrorMsg('Something went wrong. Please try again.');
+      console.error(error);
+      toast.error('something went wrong')
+      // setErrorMsg('Something went wrong. Try again.');
     } finally {
       setLoading(false);
     }
@@ -43,27 +60,28 @@ export default function VerifyOtpPage() {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6 border rounded-lg shadow">
-      <h1 className="text-2xl font-semibold mb-4">Verify OTP</h1>
+      <h2 className="text-xl font-semibold mb-4">Verify OTP</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter OTP"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          className="w-full px-4 py-2 border rounded mb-3"
-          required
-        />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+          <InputOTPSeparator />
+          <InputOTPGroup>
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
 
-        {errorMsg && <p className="text-red-500 mb-2">{errorMsg}</p>}
+        {/* {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>} */}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
+        <Button type="submit" className="w-full" disabled={loading}>
           {loading ? 'Verifying...' : 'Verify OTP'}
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -4,22 +4,23 @@ import { jwtVerify } from 'jose';
 export async function middleware(request) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get('token')?.value;
-// console.log("token",token);
 
   // Define public routes
-  const isPublicRoute = path === '/login' || path === '/signup';
+  const isPublicRoute =
+    path === '/login' ||
+    path === '/signup' ||
+    path === '/verifyotp' ||
+    path === '/' ||
+    path.startsWith('/events') ||
+    path.startsWith('/event/');
 
   // Allow public routes without a token
   if (isPublicRoute && !token) {
-    console.log("not publi route nad no token found");
-    
     return NextResponse.next();
   }
 
   // Redirect to login for non-public routes if no token
   if (!token) {
-    console.log("no token found");
-
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
@@ -28,23 +29,30 @@ export async function middleware(request) {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'vishesh456');
     const { payload } = await jwtVerify(token, secret);
     const { r } = payload;
-    const role = r
-    // console.log("role",role)
-    // console.log("payload",payload);
-    
-    // Redirect authenticated users from public routes to their dashboard
-    if (isPublicRoute && role) {
-      const dashboardPath = `/${role}/dashboard`;
-      return NextResponse.redirect(new URL(dashboardPath, request.url));
+    const role = r;
+
+    // Redirect authenticated users from login/signup to their respective dashboards
+    if (path === '/login' || path === '/signup') {
+      if (role === 'admin') {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      }
+      if (role === 'user') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+    }
+
+    // Prevent admin from accessing the homepage
+    if (path === '/' && role === 'admin') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
 
     // Role-based access control
     if (path.startsWith('/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL('/login', request.url)); // Redirect to login instead of /user/dashboard
+      return NextResponse.redirect(new URL('/login', request.url));
     }
 
     if (path.startsWith('/user') && role !== 'user') {
-      return NextResponse.redirect(new URL('/login', request.url)); // Redirect to login instead of /admin/dashboard
+      return NextResponse.redirect(new URL('/login', request.url));
     }
 
     // Allow access to the requested route
@@ -59,5 +67,14 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/user/:path*', '/login', '/signup'],
+  matcher: [
+    '/',
+    '/admin/:path*',
+    '/user/:path*',
+    '/login',
+    '/signup',
+    '/verifyotp',
+    '/events/:path*',
+    '/event/:path*',
+  ],
 };
