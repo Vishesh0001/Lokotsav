@@ -28,12 +28,12 @@ export default function Login() {
         
         if (resposne.code != 1) {
           // throw new Error(data.message?.keyword || "Login failed");
-          toast.warning(data.message.keyword)
+          toast.warning(resposne.message.keyword)
           if(resposne.code == 4){
             router.push('/verify-otp')
           }
         }else{
-          const tokenExpiry = new Date(Date.now() +  5 * 60 * 1000); // 5mins   hour
+          const tokenExpiry = new Date(Date.now() + 24* 60 * 60 * 1000); // 5 hour
         Cookies.set("token", resposne.data.token, { expires: tokenExpiry, path: '/' });
         // alert("Login successful");
         toast.success("login successfull")

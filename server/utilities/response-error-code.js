@@ -9,7 +9,7 @@ let responsecode = {
     CODE_NULL: "8",
     NOT_REGISTER: "12",
     UNAUTHORIZED: "10",
-    SERVER_ERROR : "404",
+    SERVER_ERROR : "40",
 };
 
 module.exports = responsecode;

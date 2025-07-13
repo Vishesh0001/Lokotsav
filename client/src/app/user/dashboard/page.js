@@ -89,13 +89,19 @@ useEffect( () => {
     getApprovedEvents()
 },[])
 // console.log("Approved Event IDs:", approvedEvents.map(e => e.id));
+console.log(bookmarkedEvnets);
 
 
 return(<>
- <section className="min-h-screen px-4  bg-base">
+ <section className=" px-4  bg-base">
   <h1 className="text-5xl text-transparent underline  text-center  mt-0 bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">Bookmarked Events</h1>
    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-base">
-  {bookmarkedEvnets.map((event) => (
+  {bookmarkedEvnets.length === 0 ? (
+  <div className="col-span-full flex flex-col items-center justify-center h-40 bg-muted rounded-xl">
+    <Frown className="h-8 w-8 text-gray-400" />
+    <p className="text-gray-500 mt-2 text-sm">No bookmarked events found.</p>
+  </div>
+) : (bookmarkedEvnets.map((event) => (
     <Card
       key={event.id}
       className="relative h-138 bg-white border border-base/20 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group"
@@ -167,14 +173,19 @@ return(<>
         </div>
       </CardFooter>
     </Card>
-  ))}
+  )))}
 </div>
 </section>
 
 <section className=" px-4  bg-base">
 <h1 className="text-5xl text-transparent underline  text-center  mt-4 bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">Approved Events</h1>
    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-base">
-  {approvedEvents.map((event) => (
+  {approvedEvents.length ==0 ? (
+  <div className="col-span-full flex flex-col items-center justify-center h-40 bg-muted rounded-xl">
+    <Frown className="h-8 w-8 text-gray-400" />
+    <p className="text-gray-500 mt-2 text-sm">No aprroved events found.</p>
+  </div>
+) : (approvedEvents.map((event) => (
     <Card
       key={event.id}
       className="relative h-135 bg-white border border-base/20 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group"
@@ -246,7 +257,7 @@ return(<>
         </div>
       </CardFooter>
     </Card>
-  ))}
+  )))}
 </div>
 
 
@@ -255,7 +266,12 @@ return(<>
 <section className=" px-1 mt-2 bg-base">
 <h1 className="text-5xl text-transparent underline  text-center  mt-4 bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">Events Awaiting Approval </h1>
    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-base">
-  {unapprovedEvents.map((event) => (
+  {unapprovedEvents.length == 0 ? (
+  <div className="col-span-full flex flex-col items-center justify-center h-40 bg-muted rounded-xl">
+    <Frown className="h-8 w-8 text-gray-400" />
+    <p className="text-gray-500 mt-2 text-sm">No events created by you .</p>
+  </div>
+) : (unapprovedEvents.map((event) => (
     <Card
       key={event.id}
       className="relative h-135 bg-white border border-base/20 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group"
@@ -327,7 +343,7 @@ return(<>
         </div>
       </CardFooter>
     </Card>
-  ))}
+  )))}
 </div>
 
 

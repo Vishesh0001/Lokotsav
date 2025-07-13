@@ -81,13 +81,35 @@ export default function Navbar() {
                 <span>{location || 'Select Location'}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {['Vadodara', 'Ahmedabad', 'Surat', 'Rajkot'].map((city) => (
-                <DropdownMenuItem key={city} onSelect={() => setLocation(city)}>
-                  {city}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
+     <DropdownMenuContent className="max-h-60 overflow-y-auto">
+  {[
+    'Ahmedabad',
+    'Amreli',
+    'Anand',
+    'Bharuch',
+    'Bhavnagar',
+    'Dahod',
+    'Gandhinagar',
+    'Jamnagar',
+    'Junagadh',
+    'Mehsana',
+    'Morbi',
+    'Nadiad',
+    'Navsari',
+    'Porbandar',
+    'Rajkot',
+    'Surat',
+    'Surendranagar',
+    'Vadodara',
+    'Valsad',
+    'Veraval'
+  ].map((city) => (
+    <DropdownMenuItem key={city} onSelect={() => setLocation(city)}>
+      {city}
+    </DropdownMenuItem>
+  ))}
+</DropdownMenuContent>
+
           </DropdownMenu>
 
           <Button type="submit" className="border-softPink hover:bg-softPink/40">

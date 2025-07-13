@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { User, Plus, ClipboardList, Edit3 } from 'lucide-react';
+import Categories from '@/components/Categories';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -53,11 +55,11 @@ export default function AdminDashboard() {
         </Button>
 
         <Button
-          onClick={() => navigateTo('/admin/edit-event')}
+          onClick={() => navigateTo('/admin/events')}
           className="w-full flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-6 shadow-lg"
         >
           <Edit3 className="w-5 h-5" />
-          <span>Edit Event</span>
+          <span>Edit/Delete Event</span>
         </Button>
 
         <Button
@@ -69,13 +71,16 @@ export default function AdminDashboard() {
         </Button>
 
         <Button
-          onClick={() => navigateTo('/admin/user-list')}
+          onClick={() => navigateTo('/admin/users-list')}
           className="w-full flex items-center justify-center space-x-2 bg-softPink hover:bg-rose-400 text-white rounded-xl py-6 shadow-lg"
         >
           <User className="w-5 h-5" />
           <span>User List</span>
         </Button>
+        <Link href='/admin/events'><Button    className="w-full flex items-center justify-center space-x-2 bg-purple-600 hover:bg-purple-300 text-white rounded-xl py-6 shadow-lg">
+          All events</Button></Link>
       </div>
+      <Categories/>
     </div>
   );
 }

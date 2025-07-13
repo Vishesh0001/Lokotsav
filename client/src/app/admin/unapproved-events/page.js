@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import secureFetch from '@/utils/securefetch';
-import { toast } from 'sonner';
+import { toast} from 'sonner';
+import Link from 'next/link';
 
 const UnapprovedEventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -13,7 +14,7 @@ const UnapprovedEventsPage = () => {
     const fetchUnapprovedEvents = async () => {
       try {
         const res = await secureFetch('/unapproved', {}, 'GET',true);
-console.log(res);
+// console.log(res);
 
         if (res.code == 1) {
           setEvents(res.data || []);
@@ -31,21 +32,35 @@ console.log(res);
     fetchUnapprovedEvents();
   }, []);
 
-  // Placeholder handlers (replace with your real logic)
-  const handleApprove = (id) => {
-    console.log('Approve', id);
-    // your logic here
-  };
+async function handleApprove(id) {
+  try {
+    const response = await secureFetch('/approve', { id }, 'POST', true);
 
-  const handleView = (id) => {
-    console.log('View Details', id);
-    // your logic here
-  };
+    if (response.code == 1) {
+      toast.success('Event approved successfully!');
 
-  const handleDelete = (id) => {
-    console.log('Delete', id);
-    // your logic here
-  };
+    } else {
+      toast.error(response.message?.keyword || 'Approval failed.');
+    }
+  } catch (err) {
+    console.error('Error approving event:', err);
+    toast.error('Server error while approving event.');
+  }
+}
+async function handleDelete(id) {
+  try {
+    const response = await secureFetch('/deleteEvent', { id }, 'POST', true);
+
+    if (response.code == 1) {
+      toast.success('Event Deleted successfully!');
+    } else {
+      toast.error(response.message?.keyword || 'deletion failed.');
+    }
+  } catch (err) {
+    console.error('Error approving event:', err);
+    toast.error('Server error while approving event.');
+  }
+}
 
   return (
     <section className="min-h-screen p-6 bg-base">
@@ -77,7 +92,7 @@ console.log(res);
                 </p>
               </div>
 
-              {/* Buttons */}
+
               <div className="mt-4 md:mt-0 md:ml-6 flex flex-wrap gap-2">
                 <button
                   onClick={() => handleApprove(event.id)}
@@ -85,12 +100,14 @@ console.log(res);
                 >
                   Approve
                 </button>
+                <Link href={`/event/${event.id}`}>
                 <button
-                  onClick={() => handleView(event.id)}
+                
                   className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md"
                 >
                   View Details
                 </button>
+                </Link>
                 <button
                   onClick={() => handleDelete(event.id)}
                   className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md"

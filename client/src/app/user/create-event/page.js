@@ -27,7 +27,7 @@ const validationSchema = Yup.object().shape({
   city: Yup.string().required('City is required'),
   category: Yup.string().required('Category is required'),
   description: Yup.string().required('Description is required'),
-  cover_image: Yup.string().required('Cover image URL is required'),
+
   tips: Yup.string(),
   cultural_significance: Yup.string(),
   location: Yup.string().required('Location is required'),
@@ -44,7 +44,7 @@ export default function AddEvent() {
       city: '',
       category: '',
       description: '',
-      cover_image: '',
+      cover_image: 'https://placehold.co/600x400?text=User+Created+Event',
       tips: '',
       cultural_significance: '',
       location: '',
@@ -116,26 +116,40 @@ export default function AddEvent() {
           {formik.errors.end_time && <p className="text-red-500 mt-2 text-sm">{formik.errors.end_time}</p>}
         </div>
 
-        <div>
-          <Label htmlFor="city" className="text-deepNavy mb-2">City</Label>
-          <select
-            id="city"
-            name="city"
-            onChange={formik.handleChange}
-            value={formik.values.city}
-            className="w-full p-2 border border-softPink rounded focus:ring-accent bg-base text-gray-500"
-          >
-            <option value="">Select City</option>
-            <option value="vadodra">Vadodra</option>
-            <option value="ahemedabad">Ahemedabad</option>
-            <option value="gandhinagar">Gandhinagar</option>
-            <option value="surat">Surat</option>
-            <option value="junagadh">Junagadh</option>
-            <option value="rajkot">Rajkot</option>
-            <option value="bhavnagar">Bhavnagar</option>
-          </select>
-          {formik.errors.city && <p className="text-red-500 mt-2 text-sm">{formik.errors.city}</p>}
-        </div>
+ <div>
+  <Label htmlFor="city" className="text-deepNavy mb-2">City</Label>
+  <select
+    id="city"
+    name="city"
+    onChange={formik.handleChange}
+    value={formik.values.city}
+    className="w-full p-2 border border-softPink rounded focus:ring-accent bg-base text-gray-500"
+  >
+    <option value="">Select City</option>
+    <option value="ahmedabad">Ahmedabad</option>
+    <option value="amreli">Amreli</option>
+    <option value="anand">Anand</option>
+    <option value="bharuch">Bharuch</option>
+    <option value="bhavnagar">Bhavnagar</option>
+    <option value="dahod">Dahod</option>
+    <option value="gandhinagar">Gandhinagar</option>
+    <option value="jamnagar">Jamnagar</option>
+    <option value="junagadh">Junagadh</option>
+    <option value="mehsana">Mehsana</option>
+    <option value="morbi">Morbi</option>
+    <option value="nadiad">Nadiad</option>
+    <option value="navsari">Navsari</option>
+    <option value="porbandar">Porbandar</option>
+    <option value="rajkot">Rajkot</option>
+    <option value="surat">Surat</option>
+    <option value="surendranagar">Surendranagar</option>
+    <option value="vadodara">Vadodara</option>
+    <option value="valsad">Valsad</option>
+    <option value="veraval">Veraval</option>
+  </select>
+  {formik.errors.city && <p className="text-red-500 mt-2 text-sm">{formik.errors.city}</p>}
+</div>
+
 
         <div>
           <Label htmlFor="category" className="text-deepNavy mb-2">Category</Label>
@@ -176,18 +190,7 @@ export default function AddEvent() {
           {formik.errors.description && <p className="text-red-500 mt-2 text-sm">{formik.errors.description}</p>}
         </div>
 
-        <div>
-          <Label htmlFor="cover_image" className="text-accent">Cover Image URL</Label>
-          <Input
-            id="cover_image"
-            name="cover_image"
-            type="text"
-            onChange={formik.handleChange}
-            value={formik.values.cover_image}
-            className="w-full text-gray-500 border-softPink focus:ring-accent"
-          />
-          {formik.errors.cover_image && <p className="text-red-500 mt-2 text-sm">{formik.errors.cover_image}</p>}
-        </div>
+   
 
         <div>
           <Label htmlFor="tips" className="text-deepNavy mb-2">Tips</Label>

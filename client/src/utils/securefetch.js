@@ -1,106 +1,3 @@
-// import Cookies from 'js-cookie';
-// import { encrypt, decrypt } from './crypto'; 
-// import { jwtVerify } from 'jose';
-// import axios from 'axios';
-
-// let apiKey = process.env.NEXT_PUBLIC_API_KEY || 'vishesh456'
-
-// const jwtsecret = process.env.NEXT_PUBLIC_JWT_SECRET || 'vishesh456'
-// let  baseURL = 'http://localhost:5000/v1/user'
-// const secureFetch = async (url, data = {}, method = 'POST') => {
-//   try {
-    
-//     let cookietoken = Cookies.get('token')
-//     // console.log(Cookies.get('token'));
-    
-//  if (cookietoken !== undefined && cookietoken !== null && cookietoken !== '') {
-//   const secret = new TextEncoder().encode(jwtsecret);
-//   const { payload } = await jwtVerify(cookietoken, secret);
-//   const { r } = payload;
-//   const role = r;
-//      // Use admin base only for admin routes
-//      console.log('role',role);
-//   const adminOnlyRoutes = ['/unapproved-events', '/approve-event', '/delete-event'];
-
-//   if (role == 'admin' || adminOnlyRoutes.includes(url)) {
-//     baseURL = 'http://localhost:5000/v1/admin';
-//     }}
-//     let token;
-    
- 
-//     let encryptedApi = encrypt(apiKey)
-//     let encryptedToken = '';
-//     // console.log("data",data);
-//     if(url=='/login'|| url=='/signup'){
-//          token = ' '
-//     }else{
-//       token = cookietoken
-//       encryptedToken = encrypt(token)
-//     }
-     
-//     console.log("encrypted token",encryptedToken);
-//     // console.log("encrypted api",encryptedApi)
-    
-//     // console.log(`${baseURL}${url}`)
-//    const receivedData = JSON.stringify(data)
-
-//     const encryptedData = encrypt(receivedData);
-// // console.log("encrypted datA",encryptedData);
-// let reqOptions;
-
-// if (method === 'GET') {
-//   reqOptions = {
-//     method: 'GET',
-//     url: `${baseURL}${url}`,
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'token': encryptedToken,
-//       'api-key': encryptedApi
-//     }
-//   };
-// } else {
-//   reqOptions = {
-//     method: method,
-//     url: `${baseURL}${url}`,
-//     headers: {
-//       'Content-Type': 'application/json',
-//  'token': encryptedToken,
-//       'api-key': encryptedApi
-//     },
-//     data: {
-//       data: encryptedData
-//     }
-//   };
-// }
-// console.log('123',reqOptions)
-
-// //     return decryptedData;
-// const res = await axios(reqOptions);
-
-// const encryptedText = res.data;
-
-// const decryptedData = decrypt(encryptedText);
-// // console.log('dec',decryptedData);
-
-// // (Optional) If you expect JSON string
-// // const parsed = JSON.parse(decryptedData);
-// // const finalData= decryptedData.data
-// return decryptedData; 
-//   } catch (error) {
-//     // console.log(' login error',error);
-//     // console.log("login errroe dtaa",error.response.data)
-//     const encryptedText = error.response.data;
-
-// const decryptedData = decrypt(encryptedText);
-// console.log('dec data in login',decryptedData);
-
-// return decryptedData
-//     // console.error('Error in secureFetch:', error);
-//     // throw new Error('Error while making the secure API request');
-//   }
-// };
-
-// export default secureFetch;
 import Cookies from 'js-cookie';
 import { encrypt, decrypt } from './crypto';
 import { jwtVerify } from 'jose';
@@ -110,7 +7,7 @@ const apiKey = process.env.NEXT_PUBLIC_API_KEY || 'vishesh456';
 const jwtSecret = process.env.NEXT_PUBLIC_JWT_SECRET || 'vishesh456';
 const userBaseURL = 'http://localhost:5000/v1/user';
 const adminBaseURL = 'http://localhost:5000/v1/admin';
-
+const validStatusCodes = [200, 201, 400,401, 403, 404, 409, 410, 500];
 const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false) => {
   try {
     let baseURL = userBaseURL; // Default to user base URL
@@ -124,7 +21,7 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       console.log('role', role);
 
       // Set baseURL to admin if the user is an admin and the route is admin-specific
-      if (role === 'admin' && isAdminRoute) {
+      if (role == 'admin' || isAdminRoute) {
         baseURL = adminBaseURL;
       }
     }
@@ -140,9 +37,11 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       encryptedToken = encrypt(token);
     }
 
-    console.log('encrypted token', encryptedToken);
+    // console.log('encrypted token', encryptedToken);
 
     const receivedData = JSON.stringify(data);
+    // console.log(receivedData);
+    
     const encryptedData = encrypt(receivedData);
 
     let reqOptions;
@@ -156,6 +55,7 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
           'token': encryptedToken,
           'api-key': encryptedApi,
         },
+        validateStatus: (status) => validStatusCodes.includes(status),
       };
     } else {
       reqOptions = {
@@ -169,28 +69,54 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
         data: {
           data: encryptedData,
         },
+        validateStatus: (status) => validStatusCodes.includes(status),
       };
     }
 
     console.log('reqOptions', reqOptions);
 
     const res = await axios(reqOptions);
+    if(!res.data){
+      console.log('res.data nto found',res)
+      throw new Error('No data returned from the server')
+    }
     const encryptedText = res.data;
-    const decryptedData = decrypt(encryptedText);
 
-    return decryptedData;
+if (!encryptedText || typeof encryptedText !== 'string') {
+  throw new Error('Invalid encrypted response from the server');
+}
+
+let decryptedData;
+try {
+  decryptedData = decrypt(encryptedText); // returns a JSON string
+ 
+} catch (err) {
+  console.error('Failed to decrypt/parse response', err);
+  throw new Error('Failed to decrypt response');
+}
+
+return decryptedData;
   } catch (error) {
     console.error('Error in secureFetch:', error);
-    const encryptedText = error.response?.data;
+   const encryptedText = error.response?.data;
 
-    if (encryptedText) {
-      const decryptedData = decrypt(encryptedText);
-      console.log('dec data in error', decryptedData);
-      return decryptedData;
-    }
+if (encryptedText && typeof encryptedText === 'string') {
+  try {
+    let decryptedData = decrypt(encryptedText);
+    decryptedData = JSON.parse(decryptedData);
+    return decryptedData;
+  } catch (err) {
+    console.error('Failed to decrypt/parse error response', err);
+    throw new Error('Failed to decrypt error response');
+  }
+}
 
-    throw new Error('Error while making the secure API request');
+throw new Error('Error while making the secure API request');
   }
 };
 
 export default secureFetch;
+
+
+
+

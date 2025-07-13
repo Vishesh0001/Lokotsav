@@ -162,15 +162,18 @@ const SearchEventsPage = () => {
       try {
         const res = await secureFetch('/searchevents', { s: searchQuery, city: city }, 'POST');
 
-        if (res.code ==1) {
-          if (res.data.length == 0) {
-            setNoResults(true);
-            setEvents([]);
-          } else {
-            setNoResults(false);
-            setEvents(res.data);
-          }
-        }
+  if (res.code === 1 && Array.isArray(res.data)) {
+  if (res.data.length === 0) {
+    setNoResults(true);
+    setEvents([]);
+  } else {
+    setNoResults(false);
+    setEvents(res.data);
+  }
+} else {
+  setNoResults(true);
+  setEvents([]); // Ensure fallback is an array
+}
       } catch (error) {
         console.error('Failed to fetch events:', error);
         toast('something went wrong');

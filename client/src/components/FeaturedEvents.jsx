@@ -28,6 +28,9 @@ export default async function EventsPage() {
   
   const decrypteddata = decrypt(responseText);
    events = decrypteddata.data;
+   if(events.length ==0 || events== null){
+    return (<div className=" p-170 m-auto justify-center ">Cannot fetch fetured events</div>)
+   }
   } catch (error) {
     return(    <div className="w-200 mx-auto m-7 p-6 border rounded-2xl shadow-md bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center h-64">
       <Frown className="h-12 w-12 text-gray-500 dark:text-gray-400 mb-4" />

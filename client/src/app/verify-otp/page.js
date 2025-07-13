@@ -40,7 +40,7 @@ toast.warning('Enter OTP of 6 digits')
       const result = await res.json();
 
       if (result.code ==1) {
-                 const tokenExpiry = new Date(Date.now() +  5 * 60 * 1000); // 5mins   hour
+                 const tokenExpiry = new Date(Date.now() +  24*60 * 60 * 1000); // 5mins   hour
                Cookies.set("token", result.data.token, { expires: tokenExpiry, path: '/' });
                toast.success('verification completed')
         router.push('/');

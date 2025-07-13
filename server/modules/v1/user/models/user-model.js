@@ -2,352 +2,302 @@ const db = require("../../../../config/database");
 const common = require("../../../../utilities/common");
 const responsecode = require("../../../../utilities/response-error-code")
 const bcrypt = require("bcrypt");
-const user = require("../controller/user");
-const messages = require("../../../../../../New folder (4)/NodeStrcutureDemo/language/en");
+
 
  class UserModel{
-        async signup(request_data){ 
-
-        try{
-            console.log("signup entered")
-            // console.log("data",request_data);
-            
-            const checkUniqueEmail = await common.checkEmail(request_data.email)
-            if(!checkUniqueEmail){
-            
-                const hashedPassword = await bcrypt.hash(request_data.password, 10);
-                const userData = {
-                    username : request_data.username,
-                    
-                    email:request_data.email,
-                    password: hashedPassword
-                }
-                const insertQuery = `insert into tbl_user set ?`
-                const [queryResponse] = await db.query(insertQuery,[userData])
-                // console.log(insertQuery)
-                // console.log(queryResponse)
-                if(queryResponse.affectedRows==0){
-                    return({
-                        code:responsecode.OPERATION_FAILED,
-                        message:{keyword:"data_insertion_error"},
-                        data:null,
-                        status:400
-                    })
-                }else{
-                    const userId = queryResponse.insertId
-                    const otp = common.generateOTP()
-                    const otpData={
-                        user_id:userId,
-                        otp: otp
-                    }
-                    //**********send maill */
-                    const insertQuery =`insert into tbl_otp set?`;
-                    const [otpres] = await db.query(insertQuery,[otpData])
-                    if(otpres.affectedRows >= 1){
-                         return({
-                          code:responsecode.SUCCESS,
-                          message:{keyword:"signup_success"},
-                          data:queryResponse.insertId,
-                          status:200
-                    })}
-                }
-            }else{
-                return ({
-                    code: responsecode.OPERATION_FAILED,
-                    message: {keyword:"Email is already registered, you can login!"},
-                    data : null,
-                    status:400
-                })
+async signup(request_data){ 
+    try{
+        console.log("signup entered")
+        // console.log("data",request_data);
+        
+        const checkUniqueEmail = await common.checkEmail(request_data.email)
+        if(!checkUniqueEmail){
+        
+            const hashedPassword = await bcrypt.hash(request_data.password, 10);
+            const userData = {
+                username : request_data.username,
+                
+                email:request_data.email,
+                password: hashedPassword
             }
-        }catch(error){
-            console.log(error)
-            return({
+            const insertQuery = `insert into tbl_user set ?`
+            const [queryResponse] = await db.query(insertQuery,[userData])
+            // console.log(insertQuery)
+            // console.log(queryResponse)
+            if(queryResponse.affectedRows==0){
+                return({
+                    code: responsecode.OPERATION_FAILED,
+                    message: {keyword: "user_creation_failed"},
+                    data: null,
+                    status: 400
+                })
+            }else{
+                const userId = queryResponse.insertId
+                const otp = common.generateOTP()
+                const otpData={
+                    user_id: userId,
+                    otp: otp
+                }
+                //**********send maill */
+                const insertQuery = `insert into tbl_otp set?`;
+                const [otpres] = await db.query(insertQuery,[otpData])
+                if(otpres.affectedRows >= 1){
+                     return({
+                      code: responsecode.SUCCESS,
+                      message: {keyword: "signup_successful"},
+                      data: queryResponse.insertId,
+                      status: 201
+                })}
+            }
+        }else{
+            return ({
                 code: responsecode.OPERATION_FAILED,
-                    message: {keyword:"txt_internal_server_error"},
-                    data : error.message,
-                    status:500
+                message: {keyword: "email_already_registered"},
+                data: null,
+                status: 409
             })
         }
+    }catch(error){
+        console.log(error)
+        return({
+            code: responsecode.SERVER_ERROR,
+            message: {keyword: "internal_server_error"},
+            data: null,
+            status: 500
+        })
     }
-    async verifyOTP(request_data) {
+}
+async verifyOTP(request_data) {
     try {
         console.log(request_data);
         
-        const otp  = request_data.otp;
+        const otp = request_data.otp;
 
-        const userQuery = "SELECT user_id FROM tbl_otp WHERE otp = ?";
+        const userQuery = "SELECT user_id FROM tbl_otp WHERE otp = ? AND is_active = 1";
         const [userResult] = await db.query(userQuery, [otp]);
 
         if (userResult.length == 0) {
             return {
                 code: responsecode.OTP_NOT_VERIFIED,
-                message: { keyword: "Wrong OTP Entered" },
+                message: { keyword: "invalid_otp" },
                 data: null,
-                status: 300
+                status: 400
             };
-        }else{
-    const user_id = userResult[0].user_id;
-    const checkuser = 'select is_verified from tbl_user where is_active=1 and is_deleted = 0 and id= ? '
-    const [userresult] = await db.query (checkuser,user_id)
-if(userResult[0].is_verified==1){
-    return ({
-        code: responsecode.OPERATION_FAILED,
-        message:{keyword:' Already Verified user'},
-        data:null,
-        status:300
-
-    })
-}else{
-    //  Update user as verified
-        const updateUserQuery = "UPDATE tbl_user SET is_verified = 1 WHERE id = ?";
-        await db.query(updateUserQuery, [user_id]);
-        // Deactivate OTP
-        const deactivateOtpQuery = "UPDATE tbl_otp SET is_active = 0 WHERE user_id = ?";
-        await db.query(deactivateOtpQuery, [user_id]);
-                 let role = 'user'
-               let generatedToken = common.generateToken(user_id,role)
-                              let tokenresponse = await common.storeToken(user_id,generatedToken)
-                              if(tokenresponse)
-{    return({
-code: responsecode.SUCCESS,
-            message: { keyword: "otp_verified_successfully" },
-            data: {
-                user_id,
-               token: generatedToken
-            },
-            status: 200
-    })}
-}
+        } else {
+            const user_id = userResult[0].user_id;
+            const checkuser = 'select is_verified from tbl_user where is_active=1 and is_deleted = 0 and id= ? '
+            const [userresult] = await db.query(checkuser, [user_id])
+            if (userresult[0].is_verified == 1) {
+                return ({
+                    code: responsecode.OPERATION_FAILED,
+                    message: { keyword: "already_verified" },
+                    data: null,
+                    status: 400
+                })
+            } else {
+                // Update user as verified
+                const updateUserQuery = "UPDATE tbl_user SET is_verified = 1 WHERE id = ?";
+                await db.query(updateUserQuery, [user_id]);
+                // Deactivate OTP
+                const deactivateOtpQuery = "UPDATE tbl_otp SET is_active = 0 WHERE user_id = ?";
+                await db.query(deactivateOtpQuery, [user_id]);
+                let role = 'user'
+                let generatedToken = common.generateToken(user_id, role)
+                let tokenresponse = await common.storeToken(user_id, generatedToken)
+                if (tokenresponse) {
+                    return({
+                        code: responsecode.SUCCESS,
+                        message: { keyword: "otp_verified_successfully" },
+                        data: {
+                            user_id,
+                            token: generatedToken
+                        },
+                        status: 200
+                    })
+                } else {
+                    return({
+                        code: responsecode.SERVER_ERROR,
+                        message: { keyword: "token_storage_failed" },
+                        data: null,
+                        status: 500
+                    })
+                }
+            }
         }
-
-    
-
-        // Step 2: Verify OTP
-        const otpQuery = "SELECT * FROM tbl_otp WHERE user_id = ? AND otp = ? AND is_active = 1";
-        const [otpResult] = await db.query(otpQuery, [user_id, otp]);
-
-        if (otpResult.length === 0) {
-            return {
-                code: responseCode.OTP_NOT_VERYFIED,
-                message: { keyword: "login_invalid_credential" },
-                data: null,
-                status: 401
-            };
-        }
-
-        // Step 3: Update user as verified
-        const updateUserQuery = "UPDATE tbl_user SET is_verified = 1 WHERE id = ?";
-        await db.query(updateUserQuery, [user_id]);
-
-        // Step 4: Deactivate OTP
-        const deactivateOtpQuery = "UPDATE tbl_otp SET is_active = 0 WHERE user_id = ?";
-        await db.query(deactivateOtpQuery, [user_id]);
-
-        // Optional Step 5: Generate JWT token
-        const jwt = require("jsonwebtoken");
-        const token = jwt.sign(
-            { user_id: user_id },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-
-        return {
-            code: responseCode.SUCCESS,
-            message: { keyword: "otp_verified_successfully" },
-            data: {
-                user_id,
-                token
-            },
-            status: 200
-        };
-
     } catch (error) {
         console.error("Error in verifyOTP:", error);
         return {
-            code: responsecode.OPERATION_FAILED,
+            code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
-            data: error.message,
+            data: null,
             status: 500
         };
     }
 }
+async login(request_data){
+    try {
+        let email = request_data.email
 
-    async login(request_data){
-      
-      try{
-        let email =  request_data.email
-
-    //    let data= request_data.${field}
-        let selectQuery= `select id,role,email , password,is_active,is_deleted,is_verified from tbl_user where email = ?`
+        let selectQuery = `select id,role,email,password,is_active,is_deleted,is_verified from tbl_user where email = ?`
         // console.log("query",selectQuery);
         
-        const [response] = await db.query(selectQuery,email)
+        const [response] = await db.query(selectQuery, email)
         // console.log("res",response);
         
         let userInfo = response[0];
         // console.log("userinfo",userInfo);
         
-        if(userInfo){
-              if(userInfo.is_active==1){
-                 if(userInfo.is_deleted==0){
-                    if(userInfo.is_verified == 1){
-                    const isMatch = await bcrypt.compare(request_data.password, userInfo.password);
-                    if (isMatch){
-                              let role = userInfo.role
-                              let id= userInfo.id
-                              let generatedToken = common.generateToken(id,role)
-                              let tokenresponse = await common.storeToken(id,generatedToken)
-                              if(tokenresponse){
-                            //    await common.updateLoginFlag(id)
+        if (userInfo) {
+            if (userInfo.is_active == 1) {
+                if (userInfo.is_deleted == 0) {
+                    if (userInfo.is_verified == 1) {
+                        const isMatch = await bcrypt.compare(request_data.password, userInfo.password);
+                        if (isMatch) {
+                            let role = userInfo.role
+                            let id = userInfo.id
+                            let generatedToken = common.generateToken(id, role)
+                            let tokenresponse = await common.storeToken(id, generatedToken)
+                            if (tokenresponse) {
+                                // await common.updateLoginFlag(id)
                                 return ({
-                                    code :responsecode.SUCCESS,
-                                    message:{keyword:"login successfull"},
-                                    data:{token:generatedToken,role:role},
-                                    status:200
+                                    code: responsecode.SUCCESS,
+                                    message: { keyword: "login_successful" },
+                                    data: { token: generatedToken, role: role },
+                                    status: 200
                                 })
-                              }else{
-                                //token genertation errro
+                            } else {
+                                // token generation error
                                 return ({
-                                    code :responsecode.CODE_NULL,
-                                    message:{keyword:"token error"},
-                                    data:null,
-                                    status:401
+                                    code: responsecode.CODE_NULL,
+                                    message: { keyword: "token_generation_failed" },
+                                    data: null,
+                                    status: 500
                                 })
-                              }
-                    }else{
-                        // invalid credentials
+                            }
+                        } else {
+                            // invalid credentials
+                            return ({
+                                code: responsecode.UNAUTHORIZED,
+                                message: { keyword: "invalid_credentials" },
+                                data: null,
+                                status: 401
+                            })
+                        }
+                    } else {
                         return ({
-                            code :responsecode.UNAUTHORIZED,
-                            message:{keyword:"invalid credentials"},
-                            data:null,
-                            status:401
+                            code: responsecode.OTP_NOT_VERIFIED,
+                            message: { keyword: "email_not_verified" },
+                            data: null,
+                            status: 403
                         })
                     }
-                }else{
-                    return({
-                        code:responsecode.OTP_NOT_VERIFIED,
-                        message:{keyword:"Email not verified!"},
-                        data:null,
-                        status:300
-                    })
-                }
-                 }else{
+                } else {
                     // user deleted account signup again
                     return ({
-                        code :responsecode.NOT_REGISTER,
-                        message:{keyword:"this account is already deleted"},
-                        data:null,
-                        status:401
+                        code: responsecode.NOT_REGISTER,
+                        message: { keyword: "account_deleted" },
+                        data: null,
+                        status: 410
                     })
-                 }
-              }else{//userblocked
-                return ({
-                    code :responsecode.INACTIVE_ACCOUNT,
-                    message:{keyword:"This user has been blocked"},
-                    data:null,
-                    status:401
-                })
                 }
-        }else{
-            // user not fount or signup required
+            } else {
+                // user blocked
+                return ({
+                    code: responsecode.INACTIVE_ACCOUNT,
+                    message: { keyword: "account_blocked" },
+                    data: null,
+                    status: 403
+                })
+            }
+        } else {
+            // user not found or signup required
             return ({
-                code :responsecode.NOT_REGISTER,
-                message:{keyword:"User not registered,sign-up first!"},
-                data:null,
-                status: 401
+                code: responsecode.NOT_REGISTER,
+                message: { keyword: "user_not_registered" },
+                data: null,
+                status: 404
             })
         }
-
-
-    }catch(error){
-        console.log("user model error",error.message)
+    } catch (error) {
+        console.log("user model error", error.message)
         return ({
-            code :responsecode.SERVER_ERROR,
-            message:{keyword:"txt_server_error"},
-            data:data.message,
-            status:500
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: null,
+            status: 500
         })
     }
 }
 async logout(userId){
     try {
-       console.log("entered logout")
+        console.log("entered logout")
         // let updatequery =`update tbl_user set is_login= 0 where id=?`
-        // let response  = await db.query(updatequery,userId)
+        // let response = await db.query(updatequery,userId)
         // if(response.affectedRows!=0){
-         let tokenresponse = await common.removeToken(userId)
-         if(tokenresponse){
+        let tokenresponse = await common.removeToken(userId)
+        if(tokenresponse){
             console.log("logged out");
             
             return({
-                code:responsecode.SUCCESS,
-                message:{
-                    keyword:"txt_logout_successfull"
-                },
-                data:null,
-                status:200
-            }
-        )
-         }else{
-            return({
-                code:responsecode.OPERATION_FAILED,
-                message:{
-                    keyword:"txt_remove_token_error"
-                },
-                data:null,
-                status:400
+                code: responsecode.SUCCESS,
+                message: { keyword: "logout_successful" },
+                data: null,
+                status: 200
             })
-         }
+        } else {
+            return({
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: "token_removal_failed" },
+                data: null,
+                status: 400
+            })
+        }
         // }else{
         //     return({
-        //         code:responsecode.OPERATION_FAILED,
-        //         message:{
-        //             keyword:"txt_logout_failed"
-        //         },
-        //         data:null,
-        //         status:400
+        //         code: responsecode.OPERATION_FAILED,
+        //         message: { keyword: "logout_failed" },
+        //         data: null,
+        //         status: 400
         //     })
         // }
     } catch (error) {
-        console.log("server eror in model",error.message)
+        console.log("server error in model", error.message)
         return({
-            code:responsecode.SERVER_ERROR,
-            message:{keyword:"txt_server_error"},
-            data:null,
-            status:500
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: null,
+            status: 500
         })
     }
 }
 async eventListing(){
-    
     try {
         let selectQuery = `select * from tbl_event where is_active=1 and is_deleted=0 and is_approved=1`
-       let [response] = await db.query(selectQuery);
-       if(response){
-        // console.log('response',response);
-        
-return({
-    code:responsecode.SUCCESS,
-    message:{keyword:"txt_events_fetched"},
-    data:response,
-    status:200
-})
-
-       }else{
-        return({
-            code:responsecode.OPERATION_FAILED,
-            message:{keyword:"txt_events_not_found"},
-            data:null,
-            status:300
-        })
-       }
+        let [response] = await db.query(selectQuery);
+        if(response && response.length > 0){
+            // console.log('response',response);
+            
+            return({
+                code: responsecode.SUCCESS,
+                message: { keyword: "events_fetched" },
+                data: response,
+                status: 200
+            })
+        } else {
+            return({
+                code: responsecode.NO_DATA_FOUND,
+                message: { keyword: "no_events_found" },
+                data: [],
+                status: 200
+            })
+        }
     } catch (error) {
-        console.log("modle error",error.message)
+        console.log("model error", error.message)
         return({
-            code:responsecode.SERVER_ERROR,
-            message:{keyword:"txt_server_error"},
-            data:null,
-            status:500
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: [],
+            status: 500
         })
     }
 }
@@ -356,100 +306,99 @@ async displayEvent(eventId){
         // console.log("uuuuuuuuuuuuuuuuu",eventId);
         
         let selectQuery = `select * from tbl_event where is_active=1 and is_deleted=0 and id = ?`
-       let [response] = await db.query(selectQuery,eventId.id);
-       if(response){
-        // console.log(response);
-        
-return({
-    code:responsecode.SUCCESS,
-    message:{keyword:"txt_event_fetched"},
-    data:response[0],
-    status:200
-})
-
-       }else{
-        return({
-            code:responsecode.OPERATION_FAILED,
-            message:{keyword:"txt_event_not_found"},
-            data:null,
-            status:300
-        })
-       }
-    } catch (error) {
-        console.log("modle error",error.message)
-        return({
-            code:responsecode.SERVER_ERROR,
-            message:{keyword:"txt_server_error"},
-            data:null,
-            status:500
-        })
-    }}
-
-async featuredEvents(){
-        try {
-            let selectQuery = `select id,is_featured,event_title,category,start_time,city,description,location,registrations,cover_image from tbl_event where is_active=1 and is_deleted=0 and is_approved=1 and is_featured=1 order by start_time limit 10`
-       let [response] = await db.query(selectQuery);
-       if(response){
-        // console.log('response',response);
-        
-return({
-    code:responsecode.SUCCESS,
-    message:{keyword:"txt_featured_events_fetched"},
-    data:response,
-    status:200
-})
-
-       }else{
-        return({
-            code:responsecode.OPERATION_FAILED,
-            message:{keyword:"txt_featured_events_not_found"},
-            data:null,
-            status:300
-        })
-        } }catch (error) {
-            console.log("modle error",error.message)
-        return({
-            code:responsecode.SERVER_ERROR,
-            message:{keyword:"txt_server_error"},
-            data:null,
-            status:500
-        })
+        let [response] = await db.query(selectQuery, eventId.id);
+        if(response && response.length > 0){
+            // console.log(response);
+            
+            return({
+                code: responsecode.SUCCESS,
+                message: { keyword: "event_fetched" },
+                data: response[0],
+                status: 200
+            })
+        } else {
+            return({
+                code: responsecode.NO_DATA_FOUND,
+                message: { keyword: "event_not_found" },
+                data: [],
+                status: 404
+            })
         }
+    } catch (error) {
+        console.log("model error", error.message)
+        return({
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: [],
+            status: 500
+        })
     }
-    async getBookmarkStatus(event_id,user_id){
+}
+async featuredEvents(){
+    try {
+        let selectQuery = `select id,is_featured,event_title,category,start_time,city,description,location,registrations,cover_image from tbl_event where is_active=1 and is_deleted=0 and is_approved=1 and is_featured=1 order by start_time limit 10`
+        let [response] = await db.query(selectQuery);
+        if(response && response.length > 0){
+            // console.log('response',response);
+            
+            return({
+                code: responsecode.SUCCESS,
+                message: { keyword: "featured_events_fetched" },
+                data: response,
+                status: 200
+            })
+        } else {
+            return({
+                code: responsecode.NO_DATA_FOUND,
+                message: { keyword: "no_featured_events_found" },
+                data: [],
+                status: 200
+            })
+        }
+    } catch (error) {
+        console.log("model error", error.message)
+        return({
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: [],
+            status: 500
+        })
+    }
+}
+async getBookmarkStatus(event_id, user_id){
     try {
         // console.log(user_id);
         // console.log(event_id.event_id);
         
-        
         let Selectquery = `select is_bookmarked from tbl_event_bookmark where event_id = ? and user_id=?`
-        let [responsee]  = await db.query(Selectquery,[event_id.event_id,user_id]) 
+        let [responsee] = await db.query(Selectquery, [event_id.event_id, user_id]) 
         // console.log('res2',responsee);
         
         let response = responsee[0]
         // console.log('res',response);
         
-       if(response){
-        return ({
-            code:responsecode.SUCCESS,
-            message:{keyword:"staus found"},
-            data: response ,
-            status:200
-        })
-    }else{
-        return ({
-            code:responsecode.OPERATION_FAILED,
-            message:{keyword:"staus not found"},
-            data: null,
-            status:200
-        })
-    }
+        if(response){
+            return ({
+                code: responsecode.SUCCESS,
+                message: { keyword: "bookmark_status_found" },
+                data: response,
+                status: 200
+            })
+        } else {
+            return ({
+                code: responsecode.NO_DATA_FOUND,
+                message: { keyword: "bookmark_status_not_found" },
+                data: null,
+                status: 200
+            })
+        }
     } catch (error) {
+        console.log("model error", error.message)
         return({
-            code:responsecode.SERVER_ERROR,
-            message:{keyword:"txt_server_error"},
-            data:null,
-            status:500
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: null,
+            status: 500
         })
     }
 }
@@ -494,16 +443,16 @@ async bookmark(event_id, user_id) {
         if (updateResponse.affectedRows !== 0) {
             return {
                 code: responsecode.SUCCESS,
-                message: { keyword: "txt_bookmarked_successfully" },
+                message: { keyword: "bookmarked_successfully" },
                 data: rows[0] || { is_bookmarked: 1 },
                 status: 200
             };
         } else {
             return {
                 code: responsecode.OPERATION_FAILED,
-                message: { keyword: "txt_bookmark_failed" },
+                message: { keyword: "bookmark_failed" },
                 data: null,
-                status: 402
+                status: 400
             };
         }
 
@@ -547,16 +496,16 @@ async createEvent (requestData,user_id){
             if(response.affectedRows!=0){
                  return({
                     code:responsecode.SUCCESS,
-                    message:{keyword:"txt_event_created_successfully"},
+                    message:{keyword:"event_created_successfully"},
                     data:null,
-                    status:200
+                    status:201
                  })
             }else{
                     return({
                         code:responsecode.OPERATION_FAILED,
-                        message:{keyword:"txt_failed_to_add_event"},
+                        message:{keyword:"failed_to_add_event"},
                         data:null,
-                        status:202
+                        status:400
                     })
             }
         } catch (error) {
@@ -568,8 +517,8 @@ async createEvent (requestData,user_id){
                 status:500
             })
         }
-    }
-    async getBookmarkedEvents(user_id){
+}
+async getBookmarkedEvents(user_id){
         try {
             // console.log(user_id);
             
@@ -596,9 +545,9 @@ WHERE eb.user_id = ?
         }else{
             return ({
                 code:responsecode.OPERATION_FAILED,
-                message:{keyword:"hello hello"},
-                data: null,
-                status:300
+                message:{keyword:"no bookamrked events found"},
+                data: [],
+                status:200
             })
         }
         } catch (error) {
@@ -607,13 +556,12 @@ WHERE eb.user_id = ?
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
-                data:null,
+                data:[],
                 status:500
             })
         }
-    }
-
-    async getsubmitted(user_id){
+}
+async getsubmitted(user_id){
         try {
             console.log(user_id);
             
@@ -629,27 +577,27 @@ WHERE u.role = 'user'and u.id=?;`
             // let eventData = await this.displayEvent(response)
             return ({
                 code:responsecode.SUCCESS,
-                message:{keyword:"bookmark found"},
+                message:{keyword:"submitted events fetched"},
                 data: response ,
                 status:200
             })
         }else{
             return ({
-                code:responsecode.OPERATION_FAILED,
-                message:{keyword:"hello hello"},
-                data: null,
-                status:300
+                code:responsecode.NO_DATA_FOUND,
+                message:{keyword:"no submitted events found"},
+                data: [],
+                status:200
             })
         }
         } catch (error) {
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
-                data:null,
+                data:[],
                 status:500
             })
         }
-    }
+}
 async searchEvent(searchTerm){
     try {
         console.log("search term",searchTerm);
@@ -665,9 +613,9 @@ if (searchTerm.city) {
   params.push(searchTerm.city.toLowerCase());
 }
 
-
-        console.log("Final SQL Query:", selectQuery);
-        console.log("With Params:", params);
+// 
+        // console.log("Final SQL Query:", selectQuery);
+        // console.log("With Params:", params);
 // 
         let [response] = await db.query(selectQuery, params);
         // console.log("Search Result:", response);
@@ -680,7 +628,7 @@ return({
     
     
     code:responsecode.SUCCESS,
-    message:{keyword:"txt_event_fetched"},
+    message:{keyword:"event_fetched"},
     data:response,
     status:200
 })
@@ -688,9 +636,9 @@ return({
        }else{
         return({
             code:responsecode.OPERATION_FAILED,
-            message:{keyword:"txt_event_not_found"},
-            data:null,
-            status:300
+            message:{keyword:"event_not_found"},
+            data:[],
+            status:200
         })
        }
     } catch (error) {
@@ -698,7 +646,7 @@ return({
         return({
             code:responsecode.SERVER_ERROR,
             message:{keyword:"txt_server_error"},
-            data:null,
+            data:[],
             status:500
         })
     }
@@ -724,8 +672,8 @@ async approvedEvents(user_id){
             return ({
                 code:responsecode.OPERATION_FAILED,
                 message:{keyword:"events not found"},
-                data: null,
-                status:300
+                data: [],
+                status:200
             })
         }
         } catch (error) {
@@ -734,7 +682,7 @@ async approvedEvents(user_id){
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
-                data:null,
+                data:[],
                 status:500
             })
         }
@@ -760,8 +708,8 @@ async UnapprovedEvents(user_id){
             return ({
                 code:responsecode.OPERATION_FAILED,
                 message:{keyword:"events not found"},
-                data: null,
-                status:300
+                data:[],
+                status:200
             })
         }
         } catch (error) {
@@ -770,7 +718,7 @@ async UnapprovedEvents(user_id){
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
-                data:null,
+                data:[],
                 status:500
             })
         }
@@ -794,8 +742,8 @@ async category(request_data){
             return({
                 code:responsecode.OPERATION_FAILED,
                 message:{keyword:'category not found'},
-                data:null,
-                status:300
+                data:[],
+                status:200
             })
         }
 
@@ -805,7 +753,7 @@ async category(request_data){
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
-                data:null,
+                data:[],
                 status:500
             })
     }
