@@ -27,7 +27,7 @@ let events;
             events = response.data;
         //    console.log('cat',events);
         if(response.data.length==0){
-          return (<div> still No Events are created in {v}</div>)
+          return ( <div className="text-center text-gray-500 mt-10 text-lg">No events created in {v}</div>)
         }
            
        }else{

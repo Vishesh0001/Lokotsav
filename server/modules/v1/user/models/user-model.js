@@ -2,12 +2,12 @@ const db = require("../../../../config/database");
 const common = require("../../../../utilities/common");
 const responsecode = require("../../../../utilities/response-error-code")
 const bcrypt = require("bcrypt");
-
+const sendEmail = require("../../../../utilities/sendEmail")
 
  class UserModel{
 async signup(request_data){ 
     try{
-        console.log("signup entered")
+        // console.log("signup entered")
         // console.log("data",request_data);
         
         const checkUniqueEmail = await common.checkEmail(request_data.email)
@@ -42,6 +42,20 @@ async signup(request_data){
                 const insertQuery = `insert into tbl_otp set?`;
                 const [otpres] = await db.query(insertQuery,[otpData])
                 if(otpres.affectedRows >= 1){
+  const emailBody = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+      <h2 style="color: #333;">Hello ${request_data.username},</h2>
+      <p>Thanks for signing up on <strong>Lokotsav</strong>!</p>
+      <p>Your One-Time Password (OTP) for account verification is:</p>
+      <div style="font-size: 24px; font-weight: bold; margin: 16px 0; color: #2d8cf0;">${otp}</div>
+      <p>This OTP is valid for the next 10 minutes.</p>
+      <hr />
+      <p style="font-size: 12px; color: #999;">If you didn’t request this, please ignore this email.</p>
+    </div>
+  `;
+
+  await sendEmail(request_data.email, "Verify Your Lokotsav Account", emailBody);
+
                      return({
                       code: responsecode.SUCCESS,
                       message: {keyword: "signup_successful"},
