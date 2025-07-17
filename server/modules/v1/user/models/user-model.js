@@ -772,4 +772,202 @@ async category(request_data){
             })
     }
 }
+async checkBookingStatus(request_data,user_id){
+    try {
+        // console.log(request_data);
+        
+        let event_id = request_data.id;
+        // console.log('wewewewewe',event_id,user_id);
+        
+        let selectQuery = `select quantity,id from tbl_order where is_active=1 and is_deleted = 0 and status='pending' and user_id=? and event_id=? limit 1`
+       let [response] = await db.query(selectQuery,[user_id,event_id])
+    //    console.log('reererere',response);
+       
+         if(response) {
+            if(response.length==0){
+                return({
+                    code:responsecode.CODE_NULL,
+                    message:{keyword:'No order placed yet0'},
+                    data:[],
+                    status:200
+                })
+            }else{
+                return ({
+                    code:responsecode.SUCCESS,
+                    message:{keyword:'order is already placed'},
+                    data:response,
+                    status:200
+                })
+            }
+         }else{
+               return({
+                    code:responsecode.CODE_NULL,
+                    message:{keyword:'No order placed yet'},
+                    data:[],
+                    status:200
+                })
+         }
+    } catch (error) {
+           console.log("server errror",error.message);
+        
+            return({
+                   code:responsecode.SERVER_ERROR,
+                message:{keyword:"server error occured"},
+                data:[],
+                status:500
+            })
+    }
+}
+async createOrder(request_data,user_id){
+    try {
+        console.log(request_data);
+        
+        let event_id = request_data.event_id;
+        let quantity = request_data.quantity
+        let total_amount = request_data.total_amount;
+        let order_type = 'buy-tickets'
+        let insertQuery= 'insert into tbl_order set ?'
+      const [response] = await db.query(insertQuery, {
+  user_id,
+  event_id,
+  quantity,
+  total_amount,
+  order_type
+});
+       console.log(insertQuery);
+       let order_id = response.insertId
+        if(response.affectedRows==0){
+            return ({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"failed to place order"},
+                data:[],
+                status:401
+            })
+        }else{
+            return({
+                   code:responsecode.SUCCESS,
+                message:{keyword:"Tickets has been booked!"},
+                data:[order_id],
+                status:200
+            })
+        }
+
+    } catch (error) {
+        console.log("server errror",error.message);
+        
+            return({
+                   code:responsecode.SERVER_ERROR,
+                message:{keyword:"server error occured"},
+                data:[],
+                status:500
+            })
+    }
+}
+async updateOrder(request_data){
+    try {
+        let id = request_data.order_id
+        let total_amount = request_data.total_amount
+        let quantity = request_data.quantity
+        let updateQuery = `UPDATE tbl_order SET quantity = ?, total_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'`
+        let response = await db.query(updateQuery,[quantity,total_amount,id])
+        if(response.affectedRows!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:"updation completed"},
+                data:[],
+                status:200
+            })
+        }else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"order updation failed"},
+                data:[],
+                status:401
+            })
+        }
+    } catch (error) {
+              return({
+                   code:responsecode.SERVER_ERROR,
+                message:{keyword:"server error occured"},
+                data:[],
+                status:500
+            })
+    }
+}
+async getPaymentDetails(request_data,user_id){
+        try {
+        let order_id = request_data.id;
+        let selectQuery = `SELECT 
+    u.username,
+    o.order_type,
+    e.event_title,
+    o.total_amount
+FROM 
+    tbl_order o
+JOIN 
+    tbl_user u ON o.user_id = u.id
+JOIN 
+    tbl_event e ON o.event_id = e.id where o.id =? and u.id=? and o.is_active=1 and status='pending' ;`
+       let [response] = await db.query(selectQuery,[order_id,user_id])
+         if(response) {
+            if(response.length==0){
+                return({
+                    code:responsecode.CODE_NULL,
+                    message:{keyword:'No order placed yet'},
+                    data:[],
+                    status:200
+                })
+            }else{
+                return ({
+                    code:responsecode.SUCCESS,
+                    message:{keyword:'order is placed!'},
+                    data:response,
+                    status:200
+                })
+            }
+         }else{
+               return({
+                    code:responsecode.CODE_NULL,
+                    message:{keyword:'No order placed yet'},
+                    data:[],
+                    status:200
+                })
+         }
+    } catch (error) {
+           console.log("server errror",error.message);
+        
+            return({
+                   code:responsecode.SERVER_ERROR,
+                message:{keyword:"server error occured"},
+                data:[],
+                status:500
+            })
+    }
+}
+async payment(request_data){
+    try {
+let order_id = request_data.id;
+let orderselectQuery = `select id,order_type,user_id,event_id,total_amount from tbl_order where id = ?`
+let [response] = await db.query(orderselectQuery,[order_id])
+if(response){
+    if(response.order_status=='buy-tickets'){
+let updateOrder = `UPDATE tbl_order SET is_deleted = 1, is_active = 0,status='paid' updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' `
+    }else{
+        //fetured event payment
+        //update is_featured = 1
+    }
+}else{
+    //no response founf1
+}
+    } catch (error) {
+        console.log("server errror",error.message);
+        
+            return({
+                   code:responsecode.SERVER_ERROR,
+                message:{keyword:"server error occured"},
+                data:[],
+                status:500
+            })
+    }
+}
 }module.exports = new UserModel();

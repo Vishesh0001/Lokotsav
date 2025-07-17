@@ -26,7 +26,7 @@ loginSchema : joi.object({
    city: joi.string().min(2).max(50).required(),
    category: joi.string().min(3).max(50).required(),
    description: joi.string().min(10).required(),
-   cover_image: joi.string().required(),
+  
    tips: joi.string().allow('', null),
    cultural_significance: joi.string().allow('', null),
    location: joi.string().min(3).max(100).required()

@@ -247,6 +247,58 @@ class User{
           
         }
  }
+ async getBookingStatus(req,res){
+     try {
+            // console.log(req.body);
+            
+            const requestData = await common.decodeBody(req.body);
+            const user_id = await common.getUserIdFromToken(req)
+            const response = await userModel.checkBookingStatus(requestData,user_id);
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+  async updateOrder(req,res){
+     try {
+            // console.log(req.body);
+            
+            const requestData = await common.decodeBody(req.body);
+         
+            const response = await userModel.updateOrder(requestData);
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+ async placeOrder(req,res){
+     try {
+            // console.log(req.body);
+            
+            const requestData = await common.decodeBody(req.body);
+            const user_id = await common.getUserIdFromToken(req)
+            const response = await userModel.createOrder(requestData,user_id);
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+  async getPaymentDetails(req,res){
+     try {
+            // console.log(req.body);
+            
+            const requestData = await common.decodeBody(req.body);
+            const user_id = await common.getUserIdFromToken(req)
+            const response = await userModel.getPaymentDetails(requestData,user_id);
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
       }
     
     module.exports = new User();
