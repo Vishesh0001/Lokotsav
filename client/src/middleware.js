@@ -8,6 +8,7 @@ export async function middleware(request) {
   // Define public routes
   const isPublicRoute =
     path === '/login' ||
+     path === '/login-error' ||
     path === '/signup' ||
     path === '/verifyotp' ||
     path === '/' ||
@@ -21,7 +22,7 @@ export async function middleware(request) {
 
   // Redirect to login for non-public routes if no token
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/login-error', request.url));
   }
 
   try {
@@ -48,11 +49,11 @@ export async function middleware(request) {
 
     // Role-based access control
     if (path.startsWith('/admin') && role !== 'admin') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/login-error', request.url));
     }
 
     if (path.startsWith('/user') && role !== 'user') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/login-error', request.url));
     }
 
     // Allow access to the requested route
@@ -72,6 +73,7 @@ export const config = {
     '/admin/:path*',
     '/user/:path*',
     '/login',
+    '/login-error',
     '/signup',
     '/verifyotp',
     '/events/:path*',

@@ -21,6 +21,12 @@ const validationSchema = Yup.object().shape({
   tips: Yup.string(),
   cultural_significance: Yup.string(),
   location: Yup.string().required('Location is required'),
+   total_tickets: Yup.number().required('total event ticket is required').min(0).max(1000),
+    tickets_left: Yup.number()
+    .required('Available tickets for events is required')
+    .min(10, 'Minimum 10 tickets')
+    .max(Yup.ref('total_tickets'), 'Available tickets cannot be greater than total tickets'),
+   ticket_price:Yup.number().required('ticket price is required').min(10).max(2000)
 });
 
 export default function AddEvent() {
@@ -37,6 +43,9 @@ export default function AddEvent() {
       tips: '',
       cultural_significance: '',
       location: '',
+        total_tickets:'',
+      tickets_left:'',
+      ticket_price:'',
     },
     validationSchema,
   
@@ -179,7 +188,42 @@ export default function AddEvent() {
           {formik.errors.description && <p className="text-red-500 mt-2 text-sm">{formik.errors.description}</p>}
         </div>
 
-
+  <div>
+          <Label htmlFor="total_tickets" className="text-deepNavy mb-2">Event capacity</Label>
+          <Input
+            id="total_tickets"
+            name="total_tickets"
+            type="number"
+            onChange={formik.handleChange}
+            value={formik.values.total_tickets}
+            className="w-full text-gray-500 border-softPink focus:ring-accent"
+          />
+          {formik.errors.total_tickets && <p className="text-red-500 mt-2 text-sm">{formik.errors.total_tickets}</p>}
+        </div>
+             <div>
+          <Label htmlFor="tickets_left" className="text-deepNavy mb-2">Slots left</Label>
+          <Input
+            id="tickets_left"
+            name="tickets_left"
+            type="number"
+            onChange={formik.handleChange}
+            value={formik.values.tickets_left}
+            className="w-full text-gray-500 border-softPink focus:ring-accent"
+          />
+          {formik.errors.tickets_left && <p className="text-red-500 mt-2 text-sm">{formik.errors.tickets_left}</p>}
+        </div>
+             <div>
+          <Label htmlFor="ticket_price" className="text-deepNavy mb-2">Ticket price(In INR)</Label>
+          <Input
+            id="ticket_price"
+            name="ticket_price"
+            type="number"
+            onChange={formik.handleChange}
+            value={formik.values.ticket_price}
+            className="w-full text-gray-500 border-softPink focus:ring-accent"
+          />
+          {formik.errors.ticket_price && <p className="text-red-500 mt-2 text-sm">{formik.errors.ticket_price}</p>}
+        </div>
 
         <div>
           <Label htmlFor="tips" className="text-deepNavy mb-2">Tips</Label>

@@ -41,6 +41,8 @@ return(
     <p className="text-gray-400 mb-2"><strong className="text-accent">Registrations:</strong> {resdata.registrations}</p>
     <p className="text-gray-400 mb-2"><strong className="text-accent">Start Time:</strong> {new Date(resdata.start_time).toLocaleString()}</p>
     <p className="text-gray-400 mb-2"><strong className="text-accent">End Time:</strong> {new Date(resdata.end_time).toLocaleString()}</p>
+        <p className="text-gray-400 mb-2"><strong className="text-accent">Price(In INR):</strong> {resdata.ticket_price}</p>
+            <p className="text-gray-400 mb-2"><strong className="text-accent">Available Tickets:</strong> {resdata.tickets_left}</p>
     {resdata.tips && <p className="text-gray-400 mb-2"><strong className="text-accent">Tips:</strong> {resdata.tips}</p>}
     {resdata.cultural_significance && (
       <p className="text-gray-400 mb-2"><strong className="text-accent">Cultural Significance:</strong> {resdata.cultural_significance}</p>
@@ -49,7 +51,7 @@ return(
       <div className="mb-5 p-1 w-9 h-9 rounded-4xl text-center bg-softPink hover:bg-accent">
         <BookmarkButton event_id={id} />
       </div>
-      <Link href={`/user/tickets/${id}`}>
+      <Link href={`/user/book-tickets/${id}`}>
         <Button variant="outline"><Ticket />Buy Tickets</Button>
       </Link>
     </div>

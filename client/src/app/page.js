@@ -1,5 +1,6 @@
 import EventCards  from "@/components/FeaturedEvents";
 import HeroSection from "@/components/HeroSection";
+import TrendingPage from "@/components/TrendingEvents";
 
 
 
@@ -10,6 +11,7 @@ export default function Home() {
    
       <HeroSection/>
       <EventCards/>
+      <TrendingPage/>
 
     </div>
   );

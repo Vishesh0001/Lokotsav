@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Lock, AlertTriangle, Info, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import secureFetch from '@/utils/securefetch'; // Make sure this path is correct
 
 const DUMMY_CREDENTIALS = {
@@ -18,12 +18,12 @@ export default function PaymentGateway() {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
-
+const router = useRouter();
   useEffect(() => {
     const getPaymentData = async () => {
       try {
         const response = await secureFetch('/payment-data', { id }, 'POST');
-        console.log('asdasdadad',response)
+        // console.log('asdasdadad',response)
         if (response.code == 8) {
           toast.error('Cannot find your data');
         } else if (response.code == 1) {
@@ -64,10 +64,16 @@ console.log('psymentdaaa',paymentData);
         setIsLoading(false);
         return;
       }
-
+        const res1 = await secureFetch('/payment',{id},'POST')
+        console.log('payment res',res1)
+        if (res1.code == 1){
       await new Promise((res) => setTimeout(res, 2000));
-      console.log('Payment Success:', { ...values, ...paymentData });
+   router.push('/user/payment/success')
       toast.success('Payment Successful!');
+    }else{
+      router.push('/user/payment/failed')
+      toast.error(res1.message.keyword)
+    }
       setIsLoading(false);
     },
   });

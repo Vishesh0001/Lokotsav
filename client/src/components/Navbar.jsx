@@ -11,8 +11,26 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { Search, MapPin, Radar } from 'lucide-react';
+import { 
+  Search, 
+  MapPin, 
+  Radar, 
+  User, 
+  Calendar,
+  Bookmark,
+  Plus,
+  LayoutDashboard,
+  CreditCard,
+  Events,
+  List,
+  Menu,
+  House,
+  SquareGanttChart,
+  Trash,
+  Trash2
+} from 'lucide-react';
 import Logout from './logout';
 import { toast } from 'sonner';
 
@@ -59,6 +77,17 @@ export default function Navbar() {
           </Link>
         </div>
 
+        {/* All Events - Left of Search */}
+        <Link href="/events">
+          <Button
+            variant="outline"
+            className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
+          >
+            <List className="h-4 w-4 mr-2" />
+            All Events
+          </Button>
+        </Link>
+
         <form
           onSubmit={handleSearch}
           className="flex flex-wrap items-center gap-1 px-2 py-2 rounded-full border border-gray-300 transition hover:shadow-md hover:border-pink-400"
@@ -81,35 +110,34 @@ export default function Navbar() {
                 <span>{location || 'Select Location'}</span>
               </Button>
             </DropdownMenuTrigger>
-     <DropdownMenuContent className="max-h-60 overflow-y-auto">
-  {[
-    'Ahmedabad',
-    'Amreli',
-    'Anand',
-    'Bharuch',
-    'Bhavnagar',
-    'Dahod',
-    'Gandhinagar',
-    'Jamnagar',
-    'Junagadh',
-    'Mehsana',
-    'Morbi',
-    'Nadiad',
-    'Navsari',
-    'Porbandar',
-    'Rajkot',
-    'Surat',
-    'Surendranagar',
-    'Vadodara',
-    'Valsad',
-    'Veraval'
-  ].map((city) => (
-    <DropdownMenuItem key={city} onSelect={() => setLocation(city)}>
-      {city}
-    </DropdownMenuItem>
-  ))}
-</DropdownMenuContent>
-
+            <DropdownMenuContent className="max-h-60 overflow-y-auto">
+              {[
+                'Ahmedabad',
+                'Amreli',
+                'Anand',
+                'Bharuch',
+                'Bhavnagar',
+                'Dahod',
+                'Gandhinagar',
+                'Jamnagar',
+                'Junagadh',
+                'Mehsana',
+                'Morbi',
+                'Nadiad',
+                'Navsari',
+                'Porbandar',
+                'Rajkot',
+                'Surat',
+                'Surendranagar',
+                'Vadodara',
+                'Valsad',
+                'Veraval'
+              ].map((city) => (
+                <DropdownMenuItem key={city} onSelect={() => setLocation(city)}>
+                  {city}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
           </DropdownMenu>
 
           <Button type="submit" className="border-softPink hover:bg-softPink/40">
@@ -117,24 +145,87 @@ export default function Navbar() {
           </Button>
         </form>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <Link href="/user/dashboard">
-            <Button
-              variant="outline"
-              className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
-            >
-              Dashboard
-            </Button>
-          </Link>
+        {/* Create Event - Right of Search */}
+        <Link href="/user/create-event">
+          <Button
+            variant="outline"
+            className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Event
+          </Button>
+        </Link>
 
-          {isToken ? (
-            <Logout />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+         
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
+                  >
+                    <Menu className="h-4 w-4 mr-2" />
+                Menu
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="max-h-60 overflow-y-auto">
+                 <DropdownMenuItem asChild>
+                    <Link href="/" className="flex items-center">
+                      <House className="h-4 w-4 mr-2" />
+                      Home
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/dashboard" className="flex items-center">
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                    <Link href="/calender" className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Event Calendar
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/dashboard#approved" className="flex items-center">
+                      <SquareGanttChart className="h-4 w-4 mr-2" />
+                      My Events
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/dashboard#bookmarked" className="flex items-center">
+                      <Bookmark className="h-4 w-4 mr-2" />
+                      Bookmarked Events
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/order-details" className="flex items-center">
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Payment History
+                    </Link>
+                  </DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+                    <Link href="/user/delete-account" className="flex items-center">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  
+                
+                </DropdownMenuContent>
+              </DropdownMenu>
+          {isToken? (<Logout/>
           ) : (
             <Link href="/login">
               <Button
                 variant="outline"
                 className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
               >
+                <User className="h-4 w-4 mr-2" />
                 Login
               </Button>
             </Link>

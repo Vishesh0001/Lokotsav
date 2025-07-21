@@ -148,6 +148,81 @@ async verifyOTP(request_data) {
         };
     }
 }
+async resendOTP(user_id){
+try {
+    console.log('uuuuuuis',user_id);
+    let id = user_id.id
+   let deactivateOtpQuery =`update tbl_otp set is_active = 0, is_delete=1 where user_id = ? and is_active =1 and is_delete=0`
+   let [res] = await db.query(deactivateOtpQuery,[id])
+   if(res.affectedRows!=0){
+    let selectquery =`select email from tbl_user where id=?`
+    let [request_data] = await db.query(selectquery,id)
+    if(!request_data){
+        return({
+            code:2,
+            message:{keyword:'user not found'},
+            data:[],
+            status:400
+        })
+    }
+     const otp = common.generateOTP()
+                const otpData={
+                    user_id: id,
+                    otp: otp
+                }
+                //**********send maill */
+                const insertQuery = `insert into tbl_otp set?`;
+                const [otpres] = await db.query(insertQuery,[otpData])
+                if(otpres.affectedRows >= 1){
+  const emailBody = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+      <h2 style="color: #333;">Hello user,</h2>
+      <p>Thanks for signing up on <strong>Lokotsav</strong>!</p>
+      <p>Your RESENT One-Time Password (OTP) for account verification is:</p>
+      <div style="font-size: 24px; font-weight: bold; margin: 16px 0; color: #2d8cf0;">${otp}</div>
+      <p>This OTP is valid for the next 10 minutes.</p>
+      <hr />
+      <p style="font-size: 12px; color: #999;">If you didn’t request this, please ignore this email.</p>
+    </div>
+  `;
+
+  await sendEmail(request_data[0].email, "Verify Your Lokotsav Account", emailBody);
+
+                     return({
+                      code: responsecode.SUCCESS,
+                      message: {keyword: "OTP Resent Succesfully!"},
+                      data: [],
+                      status: 200
+                })}
+                else{
+                    // sendemailfunction fail and otp insertion failed
+                    return({
+                        code:responsecode.OPERATION_FAILED,
+                        message:{keyword:'Failed to send email, please try again later.'},
+                        data:[],
+status:400
+                    })
+                }
+   }else{
+    //no otp found / updation errror
+    return({
+        code:responsecode.OPERATION_FAILED,
+        message:{keyword:'You need to Sign-up or login'},
+        data:[],
+        status:400
+    })
+   }
+} catch (error) {
+    console.log(error);
+    
+        return({
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: null,
+            status: 500
+        })
+}
+}
 async login(request_data){
     try {
         let email = request_data.email
@@ -209,7 +284,7 @@ async login(request_data){
                     // user deleted account signup again
                     return ({
                         code: responsecode.NOT_REGISTER,
-                        message: { keyword: "account_deleted" },
+                        message: { keyword: "account might be deleted, sign-up again" },
                         data: null,
                         status: 410
                     })
@@ -218,7 +293,7 @@ async login(request_data){
                 // user blocked
                 return ({
                     code: responsecode.INACTIVE_ACCOUNT,
-                    message: { keyword: "account_blocked" },
+                    message: { keyword: "you account has been blocked by admin" },
                     data: null,
                     status: 403
                 })
@@ -283,6 +358,56 @@ async logout(userId){
             status: 500
         })
     }
+}
+async deleteaccount(request_data,user_id){
+try {
+    let email = request_data.email
+    let password = request_data.password
+let selectQuery = `select email,password from tbl_user where id =?`
+let [resp] = await db.query(selectQuery,[user_id])
+if(resp && resp.lenght!=0){
+
+     const isMatch = await bcrypt.compare(password, resp[0].password);
+    if(resp[0].email==email && isMatch){
+        let updateQuery=`update tbl_user set is_deleted = 1 where id =?`
+        let [reap1] = await db.query(updateQuery,user_id)
+        if(reap1.affectedRows!=0){
+            this.logout(user_id);
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'User deleted'},
+                data:[],
+                status:200
+            })
+        }
+        else{
+            return({
+                code:2,
+                message:{keyword:'unable to delete'},
+                data:[],
+                status:400
+            })
+        }
+    }else{
+               return({
+                code:2,
+                message:{keyword:'Entered data is incorrect!'},
+                data:[],
+                status:400
+            })
+    }
+    
+    }
+} catch (error) {
+    console.log(error);
+    
+        return({
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: null,
+            status: 500
+        })
+}
 }
 async eventListing(){
     try {
@@ -495,11 +620,13 @@ async createEvent (requestData,user_id){
                 city:requestData.city,
                 category:requestData.category,
                 description:requestData.description,
-                cover_image:requestData.cover_image,
+                cover_image:'https://placehold.co/600x400?text=User+created+Event',
                 tips:requestData.tips,
                 cultural_significance:requestData.cultural_significance,
                 location:requestData.location,
-               
+               total_tickets:requestData.total_tickets,
+               tickets_left:requestData.tickets_left,
+               ticket_price:requestData.ticket_price
                
             }
             let [response] = await db.query(insertQuery,[eventData])
@@ -783,15 +910,7 @@ async checkBookingStatus(request_data,user_id){
        let [response] = await db.query(selectQuery,[user_id,event_id])
     //    console.log('reererere',response);
        
-         if(response) {
-            if(response.length==0){
-                return({
-                    code:responsecode.CODE_NULL,
-                    message:{keyword:'No order placed yet0'},
-                    data:[],
-                    status:200
-                })
-            }else{
+         if(response && response.length!=0) {
                 return ({
                     code:responsecode.SUCCESS,
                     message:{keyword:'order is already placed'},
@@ -799,15 +918,20 @@ async checkBookingStatus(request_data,user_id){
                     status:200
                 })
             }
-         }else{
-               return({
-                    code:responsecode.CODE_NULL,
-                    message:{keyword:'No order placed yet'},
+            let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status='paid' and user_id=? and event_id=? `
+            let [res1] = await db.query(ticketsBooked,[user_id,event_id])
+            console.log('weew',res1);
+            
+            if(res1[0].total_booked >= 10){
+                return ({
+                    code:responsecode.OPERATION_FAILED,
+                    message:{keyword:'You can purchase maximum 10 tickets.Try with anohter account'},
                     data:[],
-                    status:200
+                    status:400
                 })
+            }
          }
-    } catch (error) {
+    catch (error) {
            console.log("server errror",error.message);
         
             return({
@@ -821,8 +945,21 @@ async checkBookingStatus(request_data,user_id){
 async createOrder(request_data,user_id){
     try {
         console.log(request_data);
+      let event_id = request_data.event_id;
+                     let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status='paid' and user_id=? and event_id=? `
+            let [res1] = await db.query(ticketsBooked,[user_id,event_id])
+            console.log('weew',res1);
+            
+            if(res1[0].total_booked >= 10){
+                return ({
+                    code:responsecode.OPERATION_FAILED,
+                    message:{keyword:'You can purchase maximum 10 tickets.Try with anohter account'},
+                    data:[],
+                    status:400
+                })
+            }
         
-        let event_id = request_data.event_id;
+        
         let quantity = request_data.quantity
         let total_amount = request_data.total_amount;
         let order_type = 'buy-tickets'
@@ -846,7 +983,7 @@ async createOrder(request_data,user_id){
         }else{
             return({
                    code:responsecode.SUCCESS,
-                message:{keyword:"Tickets has been booked!"},
+                message:{keyword:"Tickets has been booked! Pay the amount"},
                 data:[order_id],
                 status:200
             })
@@ -865,9 +1002,26 @@ async createOrder(request_data,user_id){
 }
 async updateOrder(request_data){
     try {
+        
         let id = request_data.order_id
         let total_amount = request_data.total_amount
         let quantity = request_data.quantity
+        let selectquery = `select user_id,event_id from tbl_order where id = ?`
+        let [res1] = await db.query(selectquery,[id])
+        if(res1&&res1.length!=0){
+                     let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status='paid' and user_id=? and event_id=? `
+            let [res1] = await db.query(ticketsBooked,[res1[0].user_id,res1[0].event_id])
+            console.log('weew',res1);
+            
+            if(res1[0].total_booked >= 10){
+                return ({
+                    code:responsecode.OPERATION_FAILED,
+                    message:{keyword:'You can purchase maximum 10 tickets.Try with anohter account'},
+                    data:[],
+                    status:400
+                })
+            }
+        }
         let updateQuery = `UPDATE tbl_order SET quantity = ?, total_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'`
         let response = await db.query(updateQuery,[quantity,total_amount,id])
         if(response.affectedRows!=0){
@@ -944,27 +1098,294 @@ JOIN
             })
     }
 }
-async payment(request_data){
+async payment(request_data) {
+    let connection;
     try {
-let order_id = request_data.id;
-let orderselectQuery = `select id,order_type,user_id,event_id,total_amount from tbl_order where id = ?`
-let [response] = await db.query(orderselectQuery,[order_id])
-if(response){
-    if(response.order_status=='buy-tickets'){
-let updateOrder = `UPDATE tbl_order SET is_deleted = 1, is_active = 0,status='paid' updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' `
-    }else{
-        //fetured event payment
-        //update is_featured = 1
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+
+        let order_id = request_data.id;
+        let orderselectQuery = `SELECT id, order_type, user_id, event_id, quantity, total_amount, status 
+                               FROM tbl_order WHERE id = ? AND is_active = 1`;
+        let [response] = await connection.query(orderselectQuery, [order_id]);
+
+        if (response.length === 0) {
+            await connection.rollback();
+            return {
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: 'No active order found' },
+                data: [],
+                status: 400
+            };
+        }
+
+        response = response[0];
+
+        // Update order status first
+        let updateOrder = `UPDATE tbl_order 
+                          SET status = 'paid', updated_at = CURRENT_TIMESTAMP 
+                          WHERE id = ? AND status = 'pending' AND is_active = 1`;
+        let [res1] = await connection.query(updateOrder, [order_id]);
+
+        if (res1.affectedRows === 0) {
+            await connection.rollback();
+            return {
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: "Order update failed" },
+                data: [],
+                status: 400
+            };
+        }
+
+        // Handle different order types
+        if (response.order_type === 'buy-tickets') {
+            // Verify tickets are available before processing
+            let checkTickets = `SELECT tickets_left FROM tbl_event 
+                              WHERE id = ? AND is_active = 1 AND is_approved = 1 
+                              AND tickets_left >= ?`;
+            let [ticketCheck] = await connection.query(checkTickets, 
+                              [response.event_id, response.quantity]);
+
+            if (ticketCheck.length === 0) {
+                await connection.rollback();
+                return {
+                    code: responsecode.OPERATION_FAILED,
+                    message: { keyword: "Not enough tickets available" },
+                    data: [],
+                    status: 400
+                };
+            }
+
+            // Update event registrations and tickets
+            let updateEvent = `UPDATE tbl_event 
+                             SET registrations = registrations + ?, 
+                                 tickets_left = tickets_left - ? 
+                             WHERE id = ? AND is_active = 1 AND is_approved = 1`;
+            let [res2] = await connection.query(updateEvent, 
+                             [response.quantity, response.quantity, response.event_id]);
+
+            if (res2.affectedRows === 0) {
+                await connection.rollback();
+                return {
+                    code: responsecode.OPERATION_FAILED,
+                    message: { keyword: "Event update failed" },
+                    data: [],
+                    status: 400
+                };
+            }
+        } else {
+            // For featured events
+            let updateEvent = `UPDATE tbl_event 
+                             SET is_featured = 1 
+                             WHERE id = ? AND is_active = 1 AND is_approved = 1`;
+            let [res2] = await connection.query(updateEvent, [response.event_id]);
+
+            if (res2.affectedRows === 0) {
+                await connection.rollback();
+                return {
+                    code: responsecode.OPERATION_FAILED,
+                    message: { keyword: "Event feature update failed" },
+                    data: [],
+                    status: 400
+                };
+            }
+        }
+
+        // Create payment record
+        let insertPayment = `INSERT INTO tbl_payment SET ?`;
+        let [res3] = await connection.query(insertPayment, {
+            order_id: response.id,
+            status: 'succeeded',
+            amount_paid: response.total_amount
+        });
+
+        if (res3.affectedRows === 0) {
+            await connection.rollback();
+            return {
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: "Payment creation failed" },
+                data: [],
+                status: 400
+            };
+        }
+
+        await connection.commit();
+        return {
+            code: responsecode.SUCCESS,
+            message: { keyword: 'PAYMENT Success!!' },
+            data: [],
+            status: 200
+        };
+
+    } catch (error) {
+        if (connection) await connection.rollback();
+        console.error("Payment error:", error);
+        return {
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "Server error occurred" },
+            data: [],
+            status: 500
+        };
+    } finally {
+        if (connection) connection.release();
     }
-}else{
-    //no response founf1
+}
+async getEventsForFeature(user_id){
+         try {
+            // console.log(user_id);
+            
+            let Selectquery = `select id,event_title, category, start_time,end_time,city,cover_image,cultural_significance,tips,description,location,registrations from tbl_event where user_id= ? and is_active=1 and is_deleted=0 and is_approved=1 and is_featured=0;`
+            let [responsee]  = await db.query(Selectquery,[user_id]) 
+            let response = responsee
+            // console.log(response);
+            
+           if(response){
+            // let eventData = await this.displayEvent(response)
+            return ({
+                code:responsecode.SUCCESS,
+                message:{keyword:"approved events found"},
+                data: response ,
+                status:200
+            })
+        }else{
+            return ({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:"events not found"},
+                data: [],
+                status:200
+            })
+        }
+        } catch (error) {
+            console.log('server error',error.message);
+            
+            return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+        }
+}
+async featureorder(request_data,user_id){
+    try {
+        let event_id = request_data.id
+
+        let insertquery = `insert into tbl_order set ?`
+        let [response] = await db.query(insertquery,{total_amount:99,quantity:1,order_type:'featured',user_id:user_id,event_id:event_id})
+        if(response.affectedRows!=0){
+            let order_id = response.insertId
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'Order generated '},
+                data:order_id,
+                status:200
+            })
+        }else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:'failed to order feature event'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+               return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+    }
+}
+async orderDetails(user_id){
+    try {
+        let selectQuery = `SELECT 
+    p.id AS payment_id,
+    p.amount_paid,
+    p.status AS payment_status,
+    p.payment_time,
+    o.id AS order_id,
+    o.order_type,
+    o.total_amount,
+    o.status AS order_status,
+    e.event_title
+
+FROM tbl_payment p
+JOIN tbl_order o ON p.order_id = o.id
+JOIN tbl_event e ON o.event_id = e.id
+WHERE o.user_id = ? AND p.is_active = 1
+ORDER BY p.payment_time DESC;
+`
+        let [res1] = await db.query(selectQuery,user_id)
+        if(res1 && res1.length!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'orders fetched'},
+                data:res1,
+                status:200
+            })
+        }else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:'failed to fetch oreder'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+        console.log('server err',error);
+        
+               return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+    }
+}
+async trendingEvents(){
+    try {
+        let selectQuery = `SELECT 
+    id ,
+    event_title,
+    cover_image,
+    category,
+    city,
+    location,
+    description,
+    start_time,
+    end_time,
+    registrations,
+    is_featured
+FROM tbl_event
+WHERE 
+    is_active = 1
+    AND is_approved = 1
+    AND is_deleted = 0
+ORDER BY 
+    registrations DESC
+LIMIT 8;
+`
+let [res] = await db.query(selectQuery)
+if(res && res.length !=0){
+    return({
+        code:responsecode.SUCCESS,
+        message:{keyword:'trending event found'},
+        data:res,
+        status:200
+    })
+} else{
+    return({
+        code:responsecode.OPERATION_FAILED,
+        message:{keyword:'no tranding event found'},
+        data:[],
+        status:400
+    })
 }
     } catch (error) {
-        console.log("server errror",error.message);
-        
-            return({
-                   code:responsecode.SERVER_ERROR,
-                message:{keyword:"server error occured"},
+                 return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
                 data:[],
                 status:500
             })

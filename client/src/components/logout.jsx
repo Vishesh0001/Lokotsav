@@ -11,7 +11,7 @@ export default function Logout() {
   async function handleLogout() {
     const token = Cookies.get("token");
     const encryptedToken = encrypt(token)
-    console.log("token", token);
+    // console.log("token", token);
 
     try {
       const response = await fetch('http://localhost:5000/v1/user/logout', {
@@ -47,11 +47,12 @@ console.log(response);
     // >
     //   Logout
     // </button>
-    <button onClick={handleLogout} className="p-[3px] relative">
-    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
-    <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
-      Logout
-    </div>
-  </button>
+    <button 
+  onClick={handleLogout} 
+  className="group relative px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40 hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
+>
+  <span className="relative z-10">Logout</span>
+  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-600 to-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+</button>
   );
 }

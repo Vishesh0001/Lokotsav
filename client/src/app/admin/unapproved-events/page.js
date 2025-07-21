@@ -105,7 +105,7 @@ async function handleDelete(id) {
                 
                   className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md"
                 >
-                  View Details
+                  Explore
                 </button>
                 </Link>
                 <button

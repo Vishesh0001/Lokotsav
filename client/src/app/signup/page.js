@@ -44,8 +44,9 @@ export default function Signup() {
           toast.warning(response.message.keyword)
       
         } else {
+        let id =   response.data
        toast.success("sign-up successfull!")
-          router.push('/verify-otp');
+          router.push(`/verify-otp/${id}`);
            toast('OTP sent to entered Email')
         }
       } catch (err) {

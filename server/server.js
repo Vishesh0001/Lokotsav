@@ -2,11 +2,10 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const dotenv =require('dotenv')
 const app_routing = require('./modules/app-routing')
-// const validators = require('./middleware/validator')
+
 // const path = require('path')
 const cors = require('cors');
-// const userModel = require('./modules/v1/user/models/user-model')
-// const common = require('./utilities/common')
+
 dotenv.config();
 const app = express()
 app.use(express.text())
@@ -17,15 +16,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: 'http://localhost:3000', // Allow requests from Next.js frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
-    allowedHeaders: ['Content-Type', 'token','api-key'], // Allow custom 'token' header
-    // credentials: true, // If cookies or auth headers are needed
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'token','api-key'], 
+   
   })
 );
 
-// // Middleware to handle preflight OPTIONS requests
-// app.options('*', cors());
+
 app.use(bodyParser.text());
 app.use(bodyParser.json());
 const port = process.env.PORT;

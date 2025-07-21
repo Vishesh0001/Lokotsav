@@ -4,7 +4,7 @@ const validateWithJoi = require("../../../../middleware/validator")
 const common = require("../../../../utilities/common")
 const responsecode = require("../../../../utilities/response-error-code")
 class User{
-      async signUp(req, res) {
+async signUp(req, res) {
         try {
             const requestData = await common.decodeBody(req.body);
             
@@ -19,8 +19,8 @@ class User{
             console.error("Signup Error:", error);
             return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
         }
-      }
-      async login(req,res){
+}
+async login(req,res){
         try{
           console.log("entered login")
           // console.log(req.body)
@@ -44,18 +44,29 @@ class User{
       console.log("login error",error.message)
       return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
         }
-      }
-      async verifyOTP(req,res){
+}
+async verifyOTP(req,res){
         try {
           const otp = await req.body
           const response = await userModel.verifyOTP(otp)
           res.send(response)
         } catch (error) {
-          console.log(error);
+             res.send({code:2,message:{keyword:'server error'},data:[]})
           
         }
-      }
-      async logout(req,res){
+}
+async resendOTP(req,res){
+  try {
+    let user_id = req.body
+    const resp = await userModel.resendOTP(user_id)
+    res.send(resp)
+  } catch (error) {
+    console.log(error);
+    
+    res.send({code:2,message:{keyword:'server error'},data:[]})
+  }
+}
+async logout(req,res){
         try {
           let userId = await common.getUserIdFromToken(req)
           if(userId==-1){
@@ -68,8 +79,19 @@ class User{
           console.log("logout error",error.message)
       return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
         }
-      }
-      async getEvents(req,res){
+}
+ async deleteAccount(req,res){
+    try {
+      let request_data = await common.decodeBody(req.body)
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.deleteaccount(request_data,user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+async getEvents(req,res){
         try {
           let response = await userModel.eventListing()
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
@@ -78,8 +100,8 @@ class User{
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
-      }
-    async getEvent(req,res){
+}
+async getEvent(req,res){
         try {
           // console.log('req body ',req.body);
           
@@ -93,8 +115,8 @@ class User{
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
-      }
-      async getFeaturedEvents(req,res){
+}
+async getFeaturedEvents(req,res){
         
         try {
           let response = await userModel.featuredEvents()
@@ -105,8 +127,8 @@ class User{
           
         }
       
-      }
-            async bookmark(req,res){
+}
+async bookmark(req,res){
         try {
           let event_id = await common.decodeBody(req.body)
           // let event_id = req.body
@@ -119,8 +141,8 @@ class User{
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
-      }
-      async getBookmarkStatus(req,res){
+}
+async getBookmarkStatus(req,res){
         try {
           // console.log('req body',req.body);
           
@@ -139,8 +161,8 @@ class User{
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
-      }
-      async createEvent(req,res){
+}
+async createEvent(req,res){
     
         try {
             // console.log(req.body);
@@ -192,7 +214,7 @@ class User{
     
   }
  }
-     async searchEvent(req,res){
+async searchEvent(req,res){
         try {
           let searchTerm = await common.decodeBody(req.body)
           // console.log("searchtrerm",searchTerm);
@@ -204,8 +226,8 @@ class User{
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
-      }
-       async getApprovedEvents(req,res){
+}
+async getApprovedEvents(req,res){
   try {
     // let event_id = await common.decodeBody(req.body)
     // let event_id = req.body
@@ -299,6 +321,59 @@ class User{
             return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
         }
  }
+ async Payment(req,res){
+  try {
+      const request_data = await common.decodeBody(req.body);
+      const response = await userModel.payment(request_data);
+        return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+  } catch (error) {
+         console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+  }
+
+ }
+async getUnFeaturedEvents(req,res){
+  try {
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.getEventsForFeature(user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+ async featureorder(req,res){
+    try {
+      let request_data = await common.decodeBody(req.body)
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.featureorder(request_data,user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+ async orderDetails(req,res){
+      try {
+  
+    const user_id = await common.getUserIdFromToken(req)
+    let response = await userModel.orderDetails(user_id)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+ async trendingEvents(req,res){
+        try {
+    let response = await userModel.trendingEvents()
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+
       }
     
     module.exports = new User();

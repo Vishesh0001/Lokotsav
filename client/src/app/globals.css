@@ -8,3 +8,6 @@
  --color-deepNavy:#1F2A44;
  --color-mutedGold:#D4A017;
 }
+html {
+  scroll-behavior: smooth;
+}

@@ -22,6 +22,19 @@ export default function UserDashboard(){
     const [bookmarkedEvnets,setBookmarkedEvents]= useState([])
         const [approvedEvents, setApprovedEvents] = useState([]);
         const [unapprovedEvents, setUnApprovedEvents] = useState([]);
+          useEffect(() => {
+    const hash = window.location.hash;
+
+    if (hash) {
+      const element = document.querySelector(hash);
+      if (element) {
+        // Scroll after a short delay to ensure rendering is done
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 1000); // You can increase delay if still not accurate
+      }
+    }
+  }, []);
 useEffect( () => {
 
     async function getBookmark(){
@@ -92,8 +105,9 @@ useEffect( () => {
 console.log(bookmarkedEvnets);
 
 
-return(<>
- <section className=" px-4  bg-base">
+return(
+ <div className="scroll-smooth">
+ <section id='bookmarked'className=" px-4  bg-base">
   <h1 className="text-5xl text-transparent underline  text-center  mt-0 bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">Bookmarked Events</h1>
    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-base">
   {bookmarkedEvnets.length === 0 ? (
@@ -167,7 +181,7 @@ return(<>
           <BookmarkButton event_id={event.id} />
           <Link href={`/event/${event.id}`}>
             <button className="text-xs font-semibold text-white bg-accent hover:bg-accent/80 px-3 py-1.5 rounded-md transition-colors duration-200">
-              View Details
+Explore
             </button>
           </Link>
         </div>
@@ -177,7 +191,7 @@ return(<>
 </div>
 </section>
 
-<section className=" px-4  bg-base">
+<section id="approved" className=" px-4  bg-base">
 <h1 className="text-5xl text-transparent underline  text-center  mt-4 bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">Approved Events</h1>
    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-base">
   {approvedEvents.length ==0 ? (
@@ -251,7 +265,7 @@ return(<>
           <BookmarkButton event_id={event.id} />
           <Link href={`/event/${event.id}`}>
             <button className="text-xs font-semibold text-white bg-accent hover:bg-accent/80 px-3 py-1.5 rounded-md transition-colors duration-200">
-              View Details
+            Explore
             </button>
           </Link>
         </div>
@@ -263,7 +277,7 @@ return(<>
 
 
 </section>
-<section className=" px-1 mt-2 bg-base">
+<section id="unapproved" className=" px-1 mt-2 bg-base">
 <h1 className="text-5xl text-transparent underline  text-center  mt-4 bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">Events Awaiting Approval </h1>
    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-base">
   {unapprovedEvents.length == 0 ? (
@@ -337,7 +351,7 @@ return(<>
           {/* <BookmarkButton event_id={event.id} /> */}
           <Link href={`/event/${event.id}`}>
             <button className="text-xs font-semibold text-white bg-accent hover:bg-accent/80 px-3 py-1.5 rounded-md transition-colors duration-200">
-              View Details
+             Explore
             </button>
           </Link>
         </div>
@@ -349,7 +363,7 @@ return(<>
 
 
 </section>
-    </>
+    </div>
 )
 
 }
