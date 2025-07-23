@@ -38,6 +38,14 @@ Built by [Vishesh Shah](https://www.linkedin.com/in/vishesh-shah-357987293)
 
 ---
 
-## 📝 License
-This project is for learning and portfolio purposes.
+## ⚠️ License and Usage Notice
+
+This project is protected under an "All Rights Reserved" license. 
+
+You may **view the code**, but you are **not permitted to copy, reuse, modify, or redistribute** any part of this project without **explicit written permission** from the author.
+
+This repository is shared for **educational and portfolio purposes only**.
+
+📩 For collaboration or usage requests, contact: [visheshshah.414@gmail.com](mailto:visheshshah.414@gmail.com)
+
 
