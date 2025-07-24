@@ -7,6 +7,7 @@ import { Lock, AlertTriangle, Info, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
 import secureFetch from '@/utils/securefetch'; // Make sure this path is correct
+import { decrypt } from '@/utils/crypto';
 
 const DUMMY_CREDENTIALS = {
   cardNumber: '4532 1234 5678 9012',
@@ -15,7 +16,9 @@ const DUMMY_CREDENTIALS = {
 };
 
 export default function PaymentGateway() {
-  const { id } = useParams();
+  let { id } = useParams();
+  id = decrypt(id)
+  id = Number(id)
   const [isLoading, setIsLoading] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
 const router = useRouter();
@@ -24,10 +27,10 @@ const router = useRouter();
       try {
         const response = await secureFetch('/payment-data', { id }, 'POST');
         // console.log('asdasdadad',response)
-        if (response.code == 8) {
-          toast.error('Cannot find your data');
-        } else if (response.code == 1) {
-          setPaymentData(response.data[0]);
+        if (response.code == 1) {
+       setPaymentData(response.data[0]);
+        } else {
+          toast.error('can not find data')
         }
       } catch {
         toast.error('Payment data fetch failed');

@@ -14,7 +14,9 @@ export default function HeroSection() {
               Lokotsav
             </span>
           </h1>
-          
+          <p className="text-xl font-semibold text-accent mb-6">
+  Your gateway to the most exciting local festivals, workshops, and meetups in Gujarat!
+</p>
 
           <div className="relative">
             <p className="text-2xl md:text-3xl font-medium text-gray-700 mb-2">
@@ -34,7 +36,7 @@ export default function HeroSection() {
         </div>
 
     
-        <p className="text-lg md:text-xl text-gray-600 mb-1 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg md:text-xl text-gray-600 mb-1 mt-2 max-w-2xl mx-auto leading-relaxed">
           Discover amazing concerts, vibrant meetups, creative workshops, and exciting community events 
           happening right in your neighborhood. Join the local celebration!
         </p>
@@ -57,24 +59,6 @@ export default function HeroSection() {
           </Button>
           </Link>
         </div>
-
-        {/* Stats or Features */}
-        {/* <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div className="text-center mb-15 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 bg-softPink/10">
-            <div className="text-3xl font-bold mb-2 text-accent">1000+</div>
-            <p className="text-gray-600">Local Events</p>
-          </div>
-          
-          <div className="text-center mb-15 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 bg-accent/10">
-            <div className="text-3xl font-bold mb-2 text-softPink">50+</div>
-            <p className="text-gray-600">Cities Covered</p>
-          </div>
-          
-          <div className="text-center mb-15 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 bg-softPink/10">
-            <div className="text-3xl font-bold mb-2 text-accent">24/7</div>
-            <p className="text-gray-600">Event Discovery</p>
-          </div>
-        </div> */}
         <Categories/>
       </div>
 

@@ -74,16 +74,14 @@ generateOTP() {
     return false;
   }
 }
-async updateLoginFlag(userId){
-  try {
-    let updatequery = `update tbl_user set is_login = 1 where id= ?`
-    let [response] = await db.query(updatequery,userId)
-    if(response.affectedRows==0){
-      throw new Error('updation error'); 
-    }else{return;}
-  } catch (error) {
-    throw error
+ generateRandomCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    code += chars[randomIndex];
   }
+  return code;
 }
   async decodeBody(Adata){
     // console.log(Adata);
@@ -121,8 +119,6 @@ res.status(status).send(encryptedData)
         throw error;
     }
   }
-
-
 async removeToken(userId){
 try{ 
   let updateQuery = `update tbl_device set is_active=0,is_deleted =1 where user_id = ?`

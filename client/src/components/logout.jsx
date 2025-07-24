@@ -4,6 +4,7 @@ import { encrypt } from "@/utils/crypto";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
 
 export default function Logout() {
   const router = useRouter();
@@ -47,12 +48,13 @@ console.log(response);
     // >
     //   Logout
     // </button>
-    <button 
+    <Button
   onClick={handleLogout} 
-  className="group relative px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40 hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
+  variant='outline'
+  className="bg-red-400"
 >
   <span className="relative z-10">Logout</span>
-  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-red-600 to-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-</button>
+
+</Button>
   );
 }

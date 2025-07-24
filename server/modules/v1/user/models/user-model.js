@@ -54,7 +54,7 @@ async signup(request_data){
     </div>
   `;
 
-  await sendEmail(request_data.email, "Verify Your Lokotsav Account", emailBody);
+  await sendEmail(request_data.email, "Verify Your Lokotsav Account", emailBody,'verify-otp');
 
                      return({
                       code: responsecode.SUCCESS,
@@ -87,19 +87,19 @@ async verifyOTP(request_data) {
         
         const otp = request_data.otp;
 
-        const userQuery = "SELECT user_id FROM tbl_otp WHERE otp = ? AND is_active = 1";
+        const userQuery = "SELECT user_id FROM tbl_otp WHERE otp = ? AND is_active = 1    AND created_at >= NOW() - INTERVAL 10 MINUTE ORDER BY created_at DESC LIMIT 1";
         const [userResult] = await db.query(userQuery, [otp]);
 
         if (userResult.length == 0) {
             return {
                 code: responsecode.OTP_NOT_VERIFIED,
-                message: { keyword: "invalid_otp" },
+                message: { keyword: "invalid otp" },
                 data: null,
                 status: 400
             };
         } else {
             const user_id = userResult[0].user_id;
-            const checkuser = 'select is_verified from tbl_user where is_active=1 and is_deleted = 0 and id= ? '
+            const checkuser = 'select is_verified,created_at from tbl_user where is_active=1 and is_deleted = 0 and id= ? '
             const [userresult] = await db.query(checkuser, [user_id])
             if (userresult[0].is_verified == 1) {
                 return ({
@@ -109,6 +109,7 @@ async verifyOTP(request_data) {
                     status: 400
                 })
             } else {
+          
                 // Update user as verified
                 const updateUserQuery = "UPDATE tbl_user SET is_verified = 1 WHERE id = ?";
                 await db.query(updateUserQuery, [user_id]);
@@ -150,13 +151,13 @@ async verifyOTP(request_data) {
 }
 async resendOTP(user_id){
 try {
-    console.log('uuuuuuis',user_id);
+    // console.log('uuuuuuis',user_id);
     let id = user_id.id
    let deactivateOtpQuery =`update tbl_otp set is_active = 0, is_delete=1 where user_id = ? and is_active =1 and is_delete=0`
    let [res] = await db.query(deactivateOtpQuery,[id])
    if(res.affectedRows!=0){
     let selectquery =`select email from tbl_user where id=?`
-    let [request_data] = await db.query(selectquery,id)
+    let [request_data] = await db.query(selectquery,[id])
     if(!request_data){
         return({
             code:2,
@@ -170,7 +171,7 @@ try {
                     user_id: id,
                     otp: otp
                 }
-                //**********send maill */
+                
                 const insertQuery = `insert into tbl_otp set?`;
                 const [otpres] = await db.query(insertQuery,[otpData])
                 if(otpres.affectedRows >= 1){
@@ -185,17 +186,26 @@ try {
       <p style="font-size: 12px; color: #999;">If you didn’t request this, please ignore this email.</p>
     </div>
   `;
-
-  await sendEmail(request_data[0].email, "Verify Your Lokotsav Account", emailBody);
+try {
+     await sendEmail(request_data[0].email, "Verify Your Lokotsav Account", emailBody,'resend-otp');
+} catch (error) {
+    return({
+        code:responsecode.OPERATION_FAILED,
+        message:{keyword:error.message},
+        data:[],
+        status:500
+    })
+}
+ 
 
                      return({
                       code: responsecode.SUCCESS,
-                      message: {keyword: "OTP Resent Succesfully!"},
+                      message: {keyword: "OTP Resent Succesfully to your mail!"},
                       data: [],
                       status: 200
                 })}
                 else{
-                    // sendemailfunction fail and otp insertion failed
+                  
                     return({
                         code:responsecode.OPERATION_FAILED,
                         message:{keyword:'Failed to send email, please try again later.'},
@@ -204,7 +214,7 @@ status:400
                     })
                 }
    }else{
-    //no otp found / updation errror
+    
     return({
         code:responsecode.OPERATION_FAILED,
         message:{keyword:'You need to Sign-up or login'},
@@ -227,7 +237,7 @@ async login(request_data){
     try {
         let email = request_data.email
 
-        let selectQuery = `select id,role,email,password,is_active,is_deleted,is_verified from tbl_user where email = ?`
+        let selectQuery = `select id,role,email,password,is_active,is_deleted,is_verified from tbl_user where email = ? order by id desc limit 1`
         // console.log("query",selectQuery);
         
         const [response] = await db.query(selectQuery, email)
@@ -409,6 +419,191 @@ if(resp && resp.lenght!=0){
         })
 }
 }
+async  forgotpassword(request_data) {
+  try {
+    let email = request_data.email;
+
+    let checkquery = `SELECT id, email, is_verified, is_active, is_deleted FROM tbl_user WHERE email = ? ORDER BY id DESC LIMIT 1`;
+    let [response] = await db.query(checkquery, [email]);
+
+    if (response && response.length != 0) {
+      let user = response[0];
+
+      if (user.is_verified == 1) {
+        if (user.is_active == 1) {
+          if (user.is_deleted == 0) {
+            // success id
+            let vrificationcode = common.generateRandomCode();
+            let storedcodeflag = common.storeToken(user.id, vrificationcode);
+
+            if (storedcodeflag) {
+              const emailBody = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+  <h2 style="color: #333;">Password Reset Verification</h2>
+  <p>Hello,</p>
+  <p>We received a request to reset your password on <strong>Lokotsav</strong>.</p>
+  <p>Please use the verification code below to continue resetting your password:</p>
+  <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #2d8cf0;">${vrificationcode}</div>
+  <p>Enter this code in the application to proceed with resetting your password.</p>
+  <p>If you didn’t request this, you can safely ignore this email.</p>
+  <p style="margin-top: 20px; color: #888;">Tip: If you can't find this email, please check your Spam or Promotions folder.</p>
+</div>
+
+              `;
+
+              try {
+                await sendEmail(user.email, "Reset your Lokotsav Password", emailBody, 'forgot-password');
+
+                return {
+                  code: responsecode.SUCCESS,
+                  message: { keyword: 'Verification mail sent to your registered mail' },
+                  data: [user.id],
+                  status: 200
+                };
+
+              } catch (emailError) {
+                
+                  return {
+                    code: responsecode.OPERATION_FAILED,
+                    message: { keyword: emailError.message },
+                    data: [],
+                    status: 500
+                  };
+               
+              }
+
+            } else {
+              return {
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: 'Failed to store token' },
+                data: [],
+                status: 400
+              };
+            }
+
+          } else {
+            return {
+              code: responsecode.OPERATION_FAILED,
+              message: { keyword: 'your account has been deleted' },
+              data: [],
+              status: 400
+            };
+          }
+
+        } else {
+          return {
+            code: responsecode.OPERATION_FAILED,
+            message: { keyword: 'your account has been blocked' },
+            data: [],
+            status: 400
+          };
+        }
+
+      } else {
+        return {
+          code: responsecode.OPERATION_FAILED,
+          message: { keyword: 'your account has not verified yet' },
+          data: [],
+          status: 400
+        };
+      }
+
+    } else {
+      return {
+        code: responsecode.CODE_NULL,
+        message: { keyword: 'you not yet registered with this email' },
+        data: [],
+        status: 400
+      };
+    }
+
+  } catch (error) {
+    console.error('Forgot Password Error:', error);
+
+    return {
+      code: responsecode.SERVER_ERROR,
+      message: { keyword: "internal_server_error" },
+      data: [],
+      status: 500
+    };
+  }
+}
+async verifycode(request_data){
+    try {
+        let id =  request_data.id
+        let code = request_data.code
+        let [resp] = await db.query('select id from tbl_device where user_id=? and user_token=?',[id,code])
+        if(resp && resp.lenght!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'verification completd'},
+                data: resp[0].id,
+                status:200
+            })
+        }else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyword:'no data found'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+          return({
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "internal_server_error" },
+            data: [],
+            status: 500
+        })
+    }
+}
+async  resetPassword(request_data) {
+    try {
+        const { id, newPassword } = request_data;
+
+        if (!id || !newPassword) {
+            return {
+                code: responsecode.VALIDATION_ERROR,
+                message: { keyword: 'id_and_password_required' },
+                data: [],
+                status: 400
+            };
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const [result] = await db.query(
+            'UPDATE tbl_user SET password = ? WHERE id = ?',
+            [hashedPassword, id]
+        );
+
+        if (result.affectedRows > 0) {
+            return {
+                code: responsecode.SUCCESS,
+                message: { keyword: 'password_reset_success' },
+                data: [],
+                status: 200
+            };
+        } else {
+            return {
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: 'user_not_found_or_update_failed' },
+                data: [],
+                status: 400
+            };
+        }
+
+    } catch (error) {
+        console.error('Reset password error:', error);
+        return {
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: 'internal_server_error' },
+            data: [],
+            status: 500
+        };
+    }
+}
+
 async eventListing(){
     try {
         let selectQuery = `select * from tbl_event where is_active=1 and is_deleted=0 and is_approved=1`
@@ -899,61 +1094,75 @@ async category(request_data){
             })
     }
 }
-async checkBookingStatus(request_data,user_id){
+async checkBookingStatus(request_data, user_id) {
     try {
-        // console.log(request_data);
-        
-        let event_id = request_data.id;
-        // console.log('wewewewewe',event_id,user_id);
-        
-        let selectQuery = `select quantity,id from tbl_order where is_active=1 and is_deleted = 0 and status='pending' and user_id=? and event_id=? limit 1`
-       let [response] = await db.query(selectQuery,[user_id,event_id])
-    //    console.log('reererere',response);
-       
-         if(response && response.length!=0) {
-                return ({
-                    code:responsecode.SUCCESS,
-                    message:{keyword:'order is already placed'},
-                    data:response,
-                    status:200
-                })
-            }
-            let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status='paid' and user_id=? and event_id=? `
-            let [res1] = await db.query(ticketsBooked,[user_id,event_id])
-            console.log('weew',res1);
-            
-            if(res1[0].total_booked >= 10){
-                return ({
-                    code:responsecode.OPERATION_FAILED,
-                    message:{keyword:'You can purchase maximum 10 tickets.Try with anohter account'},
-                    data:[],
-                    status:400
-                })
-            }
-         }
-    catch (error) {
-           console.log("server errror",error.message);
-        
-            return({
-                   code:responsecode.SERVER_ERROR,
-                message:{keyword:"server error occured"},
-                data:[],
-                status:500
-            })
+        const event_id = request_data.id;
+
+        const selectQuery = `
+            SELECT quantity, id FROM tbl_order 
+            WHERE is_active = 1 AND is_deleted = 0 
+            AND status = 'pending' AND order_type = 'buy_tickets' 
+            AND user_id = ? AND event_id = ? LIMIT 1
+        `;
+        const [response] = await db.query(selectQuery, [user_id, event_id]);
+
+        if (response && response.length !== 0) {
+            return {
+                code: 1,
+                message: { keyword: 'order is already placed' },
+                data: response,
+                status: 200
+            };
+        }
+
+        const ticketsBookedQuery = `
+            SELECT SUM(quantity) as total_booked FROM tbl_order 
+            WHERE is_active = 1 AND is_deleted = 0 
+            AND user_id = ? AND event_id = ? AND order_type = 'buy_tickets'
+        `;
+        const [res1] = await db.query(ticketsBookedQuery, [user_id, event_id]);
+
+        const totalBooked = res1[0].total_booked || 0;
+
+        if (totalBooked >= 10) {
+            return {
+                code: 45,
+                message: { keyword: `You can purchase only ${10 - totalBooked} tickets` },
+                data: [],
+                status: 400
+            };
+        }
+
+        return {
+            code: 8,
+            message: { keyword: "You can book tickets" },
+            data: [],
+            status: 200
+        };
+    } catch (error) {
+        console.log("Server Error:", error.message);
+        return {
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "Server error occurred" },
+            data: [],
+            status: 500
+        };
     }
 }
+
+
 async createOrder(request_data,user_id){
     try {
         console.log(request_data);
       let event_id = request_data.event_id;
-                     let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status='paid' and user_id=? and event_id=? `
+                     let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status = 'paid' and user_id=? and event_id=? and order_type='buy-tickets'`
             let [res1] = await db.query(ticketsBooked,[user_id,event_id])
             console.log('weew',res1);
-            
-            if(res1[0].total_booked >= 10){
+            let final_total_tickets = Number(res1[0].total_booked)+Number(request_data.quantity)
+            if(final_total_tickets > 10){
                 return ({
                     code:responsecode.OPERATION_FAILED,
-                    message:{keyword:'You can purchase maximum 10 tickets.Try with anohter account'},
+                    message:{keyword:`You can purchase only ${ 10-Number(res1[0].total_booked)}`},
                     data:[],
                     status:400
                 })
@@ -1000,52 +1209,81 @@ async createOrder(request_data,user_id){
             })
     }
 }
-async updateOrder(request_data){
+async updateOrder(request_data) {
     try {
+        console.log(request_data);
         
-        let id = request_data.order_id
-        let total_amount = request_data.total_amount
-        let quantity = request_data.quantity
-        let selectquery = `select user_id,event_id from tbl_order where id = ?`
-        let [res1] = await db.query(selectquery,[id])
-        if(res1&&res1.length!=0){
-                     let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status='paid' and user_id=? and event_id=? `
-            let [res1] = await db.query(ticketsBooked,[res1[0].user_id,res1[0].event_id])
-            console.log('weew',res1);
-            
-            if(res1[0].total_booked >= 10){
-                return ({
-                    code:responsecode.OPERATION_FAILED,
-                    message:{keyword:'You can purchase maximum 10 tickets.Try with anohter account'},
-                    data:[],
-                    status:400
-                })
+        let id = request_data.order_id;
+        let total_amount = request_data.total_amount;
+        let quantity = request_data.quantity;
+
+        let selectquery = `SELECT user_id, event_id FROM tbl_order WHERE id = ? and order_type="buy-tickets"`;
+        let [orderResult] = await db.query(selectquery, [id]);
+
+        if (orderResult && orderResult.length !== 0) {
+            let user_id = orderResult[0].user_id;
+            let event_id = orderResult[0].event_id;
+
+            let ticketsBooked = `
+                SELECT SUM(quantity) AS total_booked 
+                FROM tbl_order 
+                WHERE is_active = 1 
+                AND is_deleted = 0 
+           and status ='paid'
+                AND user_id = ? 
+                AND event_id = ?
+                and order_type = 'buy-tickets'
+            `;
+
+            let [bookedResult] = await db.query(ticketsBooked, [user_id, event_id]);
+            console.log('weew', bookedResult);
+let final_total_tickets = Number(bookedResult[0].total_booked) + Number(quantity)
+
+            if (final_total_tickets > 10) {
+                console.log(final_total_tickets);
+                
+                return {
+                    code: responsecode.OPERATION_FAILED,
+                    message: { keyword: `You have booked ${ final_total_tickets-10} tickets extra ` },
+                    data: [],
+                    status: 400
+                };
             }
         }
-        let updateQuery = `UPDATE tbl_order SET quantity = ?, total_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'`
-        let response = await db.query(updateQuery,[quantity,total_amount,id])
-        if(response.affectedRows!=0){
-            return({
-                code:responsecode.SUCCESS,
-                message:{keyword:"updation completed"},
-                data:[],
-                status:200
-            })
-        }else{
-            return({
-                code:responsecode.OPERATION_FAILED,
-                message:{keyword:"order updation failed"},
-                data:[],
-                status:401
-            })
+
+        let updateQuery = `
+            UPDATE tbl_order 
+            SET quantity = ?, total_amount = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ? AND status = 'pending' and order_type = 'buy-tickets'
+        `;
+
+        let [updateResult] = await db.query(updateQuery, [quantity, total_amount, id]);
+
+        if (updateResult.affectedRows !== 0) {
+            return {
+                code: responsecode.SUCCESS,
+                message: { keyword: "updation completed" },
+                data: [],
+                status: 200
+            };
+        } else {
+            return {
+                code: responsecode.OPERATION_FAILED,
+                message: { keyword: "order updation failed" },
+                data: [],
+                status: 401
+            };
         }
+
     } catch (error) {
-              return({
-                   code:responsecode.SERVER_ERROR,
-                message:{keyword:"server error occured"},
-                data:[],
-                status:500
-            })
+        console.log(error);
+
+        return {
+            code: responsecode.SERVER_ERROR,
+            message: { keyword: "server error occured" },
+            data: [],
+            status: 500
+        };
     }
 }
 async getPaymentDetails(request_data,user_id){
@@ -1063,8 +1301,8 @@ JOIN
 JOIN 
     tbl_event e ON o.event_id = e.id where o.id =? and u.id=? and o.is_active=1 and status='pending' ;`
        let [response] = await db.query(selectQuery,[order_id,user_id])
-         if(response) {
-            if(response.length==0){
+         if(!response || response.length==0) {
+           
                 return({
                     code:responsecode.CODE_NULL,
                     message:{keyword:'No order placed yet'},
@@ -1079,16 +1317,9 @@ JOIN
                     status:200
                 })
             }
-         }else{
-               return({
-                    code:responsecode.CODE_NULL,
-                    message:{keyword:'No order placed yet'},
-                    data:[],
-                    status:200
-                })
-         }
+         
     } catch (error) {
-           console.log("server errror",error.message);
+        //    console.log("server errror",error.message);
         
             return({
                    code:responsecode.SERVER_ERROR,
@@ -1384,6 +1615,126 @@ if(res && res.length !=0){
 }
     } catch (error) {
                  return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+    }
+}
+async totalUser(){
+    try {
+        let selsctquery= 'SELECT COUNT(*) AS total_active_verified_users FROM tbl_user WHERE is_active = 1 AND is_verified = 1 AND is_deleted = 0;'
+        let [response] = await db.query(selsctquery)
+        if(response && response.length!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'recieved'},
+                data:response[0].total_active_verified_users,
+                status:200
+            })
+        }
+        else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyord:'failed'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+              return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+    }
+}
+async totalEvents(){
+    try {
+        let selsctquery= `SELECT COUNT(*) AS total_events
+FROM tbl_event
+ WHERE is_active = 1  AND is_deleted = 0 and is_approved=1`
+        let [response] = await db.query(selsctquery)
+        if(response && response.length!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'recieved'},
+                data:response[0].total_events,
+                status:200
+            })
+        }
+        else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyord:'failed'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+              return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+    }
+}
+async totalFeaturedEvents(){
+    try {
+        let selsctquery= `SELECT COUNT(*) AS total_featured
+FROM tbl_event
+ WHERE is_active = 1  AND is_deleted = 0 and is_approved=1 and is_featured =1`
+        let [response] = await db.query(selsctquery)
+        if(response && response.length!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'recieved'},
+                data:response[0].total_featured,
+                status:200
+            })
+        }
+        else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyord:'failed'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+              return({
+                code:responsecode.SERVER_ERROR,
+                message:{keyword:"txt_server_error"},
+                data:[],
+                status:500
+            })
+    }
+}
+async tottalticketssold(){
+    try {
+        let selsctquery= `SELECT sum(quantity) as total_tickets from tbl_order where status = 'paid' and order_type='buy-tickets'`
+        let [response] = await db.query(selsctquery)
+        if(response && response.length!=0){
+            return({
+                code:responsecode.SUCCESS,
+                message:{keyword:'recieved'},
+                data:response[0].total_tickets,
+                status:200
+            })
+        }
+        else{
+            return({
+                code:responsecode.OPERATION_FAILED,
+                message:{keyord:'failed'},
+                data:[],
+                status:400
+            })
+        }
+    } catch (error) {
+              return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
                 data:[],

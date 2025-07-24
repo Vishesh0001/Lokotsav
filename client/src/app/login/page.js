@@ -102,7 +102,8 @@ export default function Login() {
             {formik.isSubmitting ? "Logging in..." : "Login"}
           </Button>
         </form>
-        <p className="text-gray-500 text-center mt-3">Create Account,<Link href='signup' className="text-blue-500 ml-0.5 underline">Sign-Up</Link></p>
+        <p className="text-gray-500 text-center mt-3">Create Account,<Link href='/signup' className="text-blue-500 ml-0.5 underline">Sign-Up</Link></p>
+        <p className="text-gray-500 text-center mt-3">Frogot your password?<Link href='/forgot-password' className="text-blue-500 ml-0.5 underline">Reset password</Link></p>
       </CardContent>
     </Card>
   );

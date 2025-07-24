@@ -25,6 +25,7 @@ import {
 import BookmarkButton from "@/components/BookmarkButton";
 import {Frown, MapPin, Sparkles, Users, Clock ,IndianRupee} from "lucide-react";
 import { useRouter } from 'next/navigation';
+import { encrypt } from "@/utils/crypto";
 
 
 export default function UnfeaturedEvents(){
@@ -59,7 +60,8 @@ export default function UnfeaturedEvents(){
             if(res.code==1){
                 const order_id = res.data
                 toast.success('complete your payment')
-                router.push(`/user/payment/${order_id}`)
+                let encid = encrypt(String(order_id))
+                router.push(`/user/payment/${encid}`)
             }
             else{
                 toast.error('something went wrong while featuring you event')

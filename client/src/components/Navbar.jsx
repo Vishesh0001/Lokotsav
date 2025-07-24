@@ -29,7 +29,8 @@ import {
   House,
   SquareGanttChart,
   Trash,
-  Trash2
+  Trash2,
+  File
 } from 'lucide-react';
 import Logout from './logout';
 import { toast } from 'sonner';
@@ -77,16 +78,8 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* All Events - Left of Search */}
-        <Link href="/events">
-          <Button
-            variant="outline"
-            className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
-          >
-            <List className="h-4 w-4 mr-2" />
-            All Events
-          </Button>
-        </Link>
+     
+     
 
         <form
           onSubmit={handleSearch}
@@ -145,19 +138,9 @@ export default function Navbar() {
           </Button>
         </form>
 
-        {/* Create Event - Right of Search */}
-        <Link href="/user/create-event">
-          <Button
-            variant="outline"
-            className="bg-softPink text-black border border-softGray hover:bg-accent whitespace-nowrap"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Event
-          </Button>
-        </Link>
-
         <div className="flex flex-wrap items-center justify-end gap-2">
-         
+         <Link href='/'><Button variant='link' className='mr-0 p-0'>Home</Button></Link>
+<Link href='/about'><Button variant='link'>About us</Button></Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -169,12 +152,7 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="max-h-60 overflow-y-auto">
-                 <DropdownMenuItem asChild>
-                    <Link href="/" className="flex items-center">
-                      <House className="h-4 w-4 mr-2" />
-                      Home
-                    </Link>
-                  </DropdownMenuItem>
+              
                   <DropdownMenuItem asChild>
                     <Link href="/user/dashboard" className="flex items-center">
                       <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -200,7 +178,18 @@ export default function Navbar() {
                       Bookmarked Events
                     </Link>
                   </DropdownMenuItem>
-                  
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/create-event" className="flex items-center">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Event
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/events" className="flex items-center">
+                      <File className="h-4 w-4 mr-2" />
+                      All Events
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/user/order-details" className="flex items-center">
                       <CreditCard className="h-4 w-4 mr-2" />

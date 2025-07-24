@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import secureFetch from "@/utils/securefetch"
 import Link from "next/link";
 import { Ticket } from "lucide-react";
+import { encrypt } from "@/utils/crypto";
 
 export default async function event({params}) {
-const {id} = await params;
+let  {id} = await params;
+let encid= encrypt(id)
 let resdata;
 
 try {
@@ -14,6 +16,8 @@ try {
     
     if(response.code==1){
          resdata = await response.data
+        
+         
         if(response.data.length==0){
           return(<p>no such event</p>)
         }
@@ -51,7 +55,7 @@ return(
       <div className="mb-5 p-1 w-9 h-9 rounded-4xl text-center bg-softPink hover:bg-accent">
         <BookmarkButton event_id={id} />
       </div>
-      <Link href={`/user/book-tickets/${id}`}>
+      <Link href={`/user/book-tickets/${encid}`}>
         <Button variant="outline"><Ticket />Buy Tickets</Button>
       </Link>
     </div>

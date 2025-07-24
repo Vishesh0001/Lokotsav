@@ -5,17 +5,20 @@ import { useParams,useRouter } from "next/navigation";
 import secureFetch from "@/utils/securefetch";
 import { toast } from "sonner";
 import { IndianRupee } from "lucide-react";
+import { decrypt, encrypt } from "@/utils/crypto";
 
 export default function BookTicketPage() {
-  const { id } = useParams(); // Get event ID from URL
+  let { id } = useParams();
+    id  = decrypt(id)
   const [event, setEvent] = useState(null);
   const [quantity, setQuantity] = useState(0);
   const[initialQuantity,setInitialQuantity]=useState(0)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [orderId,setOrderId]=useState(0)
+  const[paymentBtn,setPaymentBtn]=useState(false)
 const router = useRouter()
-  // Fetch event details on mount
+
 useEffect(() => {
   const fetchEvent = async () => {
     try {
@@ -33,27 +36,37 @@ useEffect(() => {
     }
   };
 
-  const checkBookingStatus = async () => {
-    try {
-      const response = await secureFetch(`/booking-status`, { id }, "POST");
-      console.log(response);
-            if(response.code == 8){
-        setQuantity(1)
-      }
-     if (response.code == 1) {
-          const q = Number(response.data[0].quantity);
-          setQuantity(!isNaN(q) && q > 0 ? q : 1);
-          setInitialQuantity(q);
-          setOrderId(response.data[0].id);
-        } else {
-          setQuantity(1); 
-        }
+ const checkBookingStatus = async () => {
+  try {
+    const response = await secureFetch(`/booking-status`, { id }, "POST");
+    console.log("Booking Status Response:", response);
 
-      }
-     catch {
-      toast.error("Booking fetch failed");
+    if (!response || !response.code) {
+      toast.error("Unexpected response from server");
+      return;
     }
-  };
+
+    if (response.code === 8) {
+      setQuantity(1);
+    } else if (response.code === 45) {
+      setQuantity(0);
+      setPaymentBtn(true);
+      toast.warning('You have already booked 10 tickets!');
+    } else if (response.code === 1) {
+      const q = Number(response.data[0].quantity);
+      setQuantity(!isNaN(q) && q > 0 ? q : 1);
+      setInitialQuantity(q);
+      const oid = encrypt(String(response.data[0].id));
+      setOrderId(oid);
+    } else {
+      setQuantity(1);
+    }
+  } catch (err) {
+    console.error("Booking Status Fetch Failed", err);
+    toast.error("Booking fetch failed");
+  }
+};
+
 
   fetchEvent();
   checkBookingStatus();
@@ -63,20 +76,22 @@ const total_amount = useMemo(() => {
   return event.ticket_price * quantity;
 }, [event, quantity]);
   // Handle ticket purchase
+
   const handleBuyTicket = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 if(orderId!= 0){
   if(quantity!=initialQuantity){
+    let decid = decrypt(orderId)
     const updateres = await secureFetch('/update-order',{
-      order_id: orderId,
+      order_id: decid,
       quantity,
       total_amount},"POST"
     )
   
   if(updateres.code!=1){
-    toast.error('Failed to update order')
+    toast.error(updateres.message.keyword)
     setLoading(false)
     return
   }toast.success('Order Updated!')
@@ -92,9 +107,9 @@ else{
       );
       if (response.code == 1) {
         toast.success(response.message.keyword );
-
+        let id = encrypt(response.data)
         
-        router.push(`/user/payment/${response.data}`)
+        router.push(`/user/payment/${id}`)
       } else {
         setError(response.message.keyword);
         toast.error(response.message.keyword || "Failed to purchase tickets");
@@ -111,14 +126,7 @@ else{
     return <div className="text-center mt-10">Loading...</div>;
   }
 
-  if (error) {
-    return (
-      <div className="text-center mt-10 text-red-500">
-        Error: {error}
-      
-      </div>
-    );
-  }
+
 
   return (
 
@@ -169,12 +177,12 @@ else{
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={paymentBtn || loading}
           className={`w-full p-2 rounded text-white font-semibold ${
             loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
           }`}
         >
-          {loading ? "Processing..." : "Buy Tickets"}
+          {loading ? "Processing..." : "Proceed to Pay"}
         </button>
       </form>
     

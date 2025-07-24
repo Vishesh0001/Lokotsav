@@ -91,6 +91,39 @@ async logout(req,res){
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
+ async forgotpassword(req,res){
+      try {
+      let request_data = await common.decodeBody(req.body)
+  
+    let response = await userModel.forgotpassword(request_data)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+  async verifycode(req,res){
+      try {
+      let request_data = await common.decodeBody(req.body)
+  
+    let response = await userModel.verifycode(request_data)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
+   async resetpassword(req,res){
+      try {
+      let request_data = await common.decodeBody(req.body)
+  
+    let response = await userModel.resetPassword(request_data)
+    common.sendResponse(req,res,response.code,response.message,response.data,response.status)
+  } catch (error) {
+    console.log("controller eror",error.message)
+    common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+  }
+ }
 async getEvents(req,res){
         try {
           let response = await userModel.eventListing()
@@ -276,6 +309,8 @@ async getApprovedEvents(req,res){
             const requestData = await common.decodeBody(req.body);
             const user_id = await common.getUserIdFromToken(req)
             const response = await userModel.checkBookingStatus(requestData,user_id);
+            // console.log(response);
+            
             return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
         }catch (error) {
             console.error("Signup Error:", error);
@@ -289,6 +324,8 @@ async getApprovedEvents(req,res){
             const requestData = await common.decodeBody(req.body);
          
             const response = await userModel.updateOrder(requestData);
+            console.log(response);
+            
             return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
         }catch (error) {
             console.error("Signup Error:", error);
@@ -373,6 +410,43 @@ async getUnFeaturedEvents(req,res){
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
+   async totalUsers(req,res){
+     try {
+            const response = await userModel.totalUser();
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+   async totalEvents(req,res){
+     try {
+            const response = await userModel.totalEvents();
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+   async totalfeaturedevents(req,res){
+     try {
+            const response = await userModel.totalFeaturedEvents();
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+    async totalTicketssold(req,res){
+     try {
+            const response = await userModel.tottalticketssold();
+            return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
+        }catch (error) {
+            console.error("Signup Error:", error);
+            return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},401);
+        }
+ }
+
 
       }
     
