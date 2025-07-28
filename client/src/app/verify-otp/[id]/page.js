@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 const RESEND_TIMEOUT = 150; // 2.5 minutes in seconds
 const MAX_RESEND_ATTEMPTS = 3;
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const encryptedApiKey =encrypt(apiKey)
 export default function VerifyOtpPage() {
   const [otp, setOtp] = useState('');
     const { id } = useParams();
@@ -45,6 +47,7 @@ toast.warning('Enter OTP of 6 digits')
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "api-key": encryptedApiKey,
         },
         body: JSON.stringify({ otp }),
       });
@@ -80,6 +83,7 @@ toast.warning('Enter OTP of 6 digits')
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "api-key": encryptedApiKey,
         },
         body: JSON.stringify({id}), 
       });

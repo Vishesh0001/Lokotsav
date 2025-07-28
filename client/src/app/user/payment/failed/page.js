@@ -25,28 +25,15 @@ export default function PaymentFailed() {
             <Home className="size-5" />
             Go Home
           </Link>
-          <Link
-            href="/payment/retry"
-            className="flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 font-medium text-white transition-colors hover:bg-red-700"
-          >
-            <CreditCard className="size-5" />
-            Try Again
-          </Link>
+    
         </div>
 
         <div className="mt-6 rounded-lg bg-gray-50 p-4 text-center">
-          <p className="text-sm text-gray-600">
-            Need help? <Link href="/contact" className="text-indigo-600 hover:underline">Contact support</Link>
-          </p>
+   
         </div>
       </section>
 
-      <style jsx global>{`
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-        }
-      `}</style>
+     
     </main>
   );
 }

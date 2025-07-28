@@ -8,7 +8,8 @@ import { Button } from "./ui/button";
 
 export default function Logout() {
   const router = useRouter();
-
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const encryptedApiKey =encrypt(apiKey)
   async function handleLogout() {
     const token = Cookies.get("token");
     const encryptedToken = encrypt(token)
@@ -20,6 +21,8 @@ export default function Logout() {
         headers: {
           'Content-Type': 'application/json',
           token: encryptedToken,
+          'api-key': encryptedApiKey,
+
         },
       });
 console.log(response);

@@ -24,7 +24,7 @@ export default function Login() {
       try {
         const body = { email: values.email, password: values.password };
         const resposne = await secureFetch("/login", body);
-        // console.log('vishesh',data);
+  
         
         if (resposne.code != 1) {
           // throw new Error(data.message?.keyword || "Login failed");
@@ -33,6 +33,8 @@ export default function Login() {
             router.push('/verify-otp')
           }
         }else{
+          console.log('visheeee',resposne);
+          
           const tokenExpiry = new Date(Date.now() + 24* 60 * 60 * 1000); // 5 hour
         Cookies.set("token", resposne.data.token, { expires: tokenExpiry, path: '/' });
         // alert("Login successful");

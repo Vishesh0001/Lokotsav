@@ -22,7 +22,10 @@ try {
             tips:requestData.tips,
             cultural_significance:requestData.cultural_significance,
             location:requestData.location,
-           is_approved: 1
+           is_approved: 1,
+              total_tickets:requestData.total_tickets,
+               tickets_left:requestData.tickets_left,
+               ticket_price:requestData.ticket_price
            
         }
         // console.log("event data inserted",eventData);

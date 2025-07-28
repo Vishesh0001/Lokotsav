@@ -10,20 +10,29 @@ import {
 } from "@/components/ui/card";
 import BookmarkButton from "@/components/BookmarkButton";
 import { Frown, MapPin, Sparkles, Users, Clock } from "lucide-react";
-import { decrypt } from "@/utils/crypto";
+import { decrypt, encrypt } from "@/utils/crypto";
 import Link from "next/link";
 import secureFetch from '@/utils/securefetch';
 import { toast } from 'sonner';
 import { useEffect, useState, useCallback } from 'react';
 
 export default function EventsPage() {
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const encryptedApiKey =encrypt(apiKey)
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchEvents = async () => {
     try {
       const res = await fetch("http://localhost:5000/v1/user/events", {
-        cache: "no-store",
+       
+      method: "GET",
+  cache: "no-store",
+  headers: {
+    "Content-Type": "application/json",
+    "api-key": encryptedApiKey, // Replace with actual key
+ 
+  },
       });
       const responseText = await res.text();
       const decrypteddata = decrypt(responseText);
@@ -80,6 +89,7 @@ export default function EventsPage() {
                 className="rounded-t-2xl w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                 src={event.cover_image}
                 alt="event cover"
+                loading="lazy"
               />
             </div>
             <div className="p-5">

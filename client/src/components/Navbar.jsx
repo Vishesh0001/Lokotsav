@@ -100,7 +100,7 @@ export default function Navbar() {
                 className="bg-white flex items-center space-x-2 border-accent text-deepNavy hover:bg-softPink whitespace-nowrap"
               >
                 <MapPin className="h-4 w-4 text-deepNavy" />
-                <span>{location || 'Select Location'}</span>
+                <span>{location || 'Select City'}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="max-h-60 overflow-y-auto">

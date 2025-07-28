@@ -3,8 +3,8 @@ import { encrypt, decrypt } from './crypto';
 import { jwtVerify } from 'jose';
 import axios from 'axios';
 
-const apiKey = process.env.NEXT_PUBLIC_API_KEY || 'vishesh456';
-const jwtSecret = process.env.NEXT_PUBLIC_JWT_SECRET || 'vishesh456';
+const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+const jwtSecret = process.env.JWT_SECRET ;
 const userBaseURL = 'http://localhost:5000/v1/user';
 const adminBaseURL = 'http://localhost:5000/v1/admin';
 const validStatusCodes = [200, 201, 400,401, 403, 404, 409, 410, 500];
@@ -77,7 +77,7 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
 
     const res = await axios(reqOptions);
     if(!res.data){
-      console.log('res.data nto found',res)
+      // console.log('res.data nto found',res)
       throw new Error('No data returned from the server')
     }
     const encryptedText = res.data;

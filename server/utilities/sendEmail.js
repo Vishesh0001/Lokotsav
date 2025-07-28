@@ -3,8 +3,8 @@ const db = require('../config/database')
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.GMAIL_USER,         // your Gmail (e.g. visheshshah.414@gmail.com)
-    pass: process.env.GMAIL_APP_PASSWORD  // 16-character app password
+    user: process.env.GMAIL_USER,         
+    pass: process.env.GMAIL_APP_PASSWORD  
   }
 });
 

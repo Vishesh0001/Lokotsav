@@ -80,6 +80,7 @@ const [Loading,setLoading] = useState(true)
   return (
     <div>
       <button
+         aria-label={isBookmarked ? "Remove bookmark" : "Add to bookmark"}
        disabled={Loading} onClick={toggleBookmark} className=" text-gray-500 hover:text-blue-600 transition">
         {isBookmarked ? <BookmarkCheck /> : <Bookmark/>}
       </button>

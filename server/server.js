@@ -5,6 +5,7 @@ const app_routing = require('./modules/app-routing')
 
 // const path = require('path')
 const cors = require('cors');
+const { validateApiKey } = require('./middleware/header-validations');
 
 dotenv.config();
 const app = express()
@@ -22,7 +23,7 @@ app.use(
    
   })
 );
-
+app.use(validateApiKey)
 
 app.use(bodyParser.text());
 app.use(bodyParser.json());
@@ -39,7 +40,7 @@ const port = process.env.PORT;
 // userModel.blogList()
 try {
   app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  ;
   });
 } 
 catch (error) {

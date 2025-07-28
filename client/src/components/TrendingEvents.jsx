@@ -16,16 +16,24 @@ import {
 } from "@/components/ui/carousel"
 import BookmarkButton from "./BookmarkButton";
 import {Frown, MapPin, Sparkles, Users, Clock, Flame } from "lucide-react";
-import { decrypt } from "@/utils/crypto";
+import { decrypt, encrypt } from "@/utils/crypto";
 import Link from "next/link";
 
 export default async function TrendingPage() {
   // Fetch from backend
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const encryptedApiKey =encrypt(apiKey)
   let events
   try {
-      const res = await fetch("http://localhost:5000/v1/user/trendingevents", {
-    cache: "no-store",
-  });
+const res = await fetch("http://localhost:5000/v1/user/trendingevents", {
+  method: "GET",
+  cache: "no-store",
+  headers: {
+    "Content-Type": "application/json",
+    "api-key": encryptedApiKey, // Replace with actual key
+ 
+  },
+});
 
   // Decrypt the response
   // console.log('ere',res);
@@ -71,7 +79,7 @@ export default async function TrendingPage() {
                       <img
                         className="rounded-t-2xl w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
                         src={event.cover_image}
-                        alt="event cover"
+                        alt="event cover" loading="lazy"
                       />
                       <div className="absolute top-2 right-2">
                         <Flame className="h-8 w-8 text-orange-500 bg-white/90 rounded-full p-1" />

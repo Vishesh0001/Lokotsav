@@ -9,15 +9,23 @@ import {
 } from "@/components/ui/card";
 import BookmarkButton from "@/components/BookmarkButton";
 import {Frown, MapPin, Sparkles, Users, Clock } from "lucide-react";
-import { decrypt } from "@/utils/crypto";
+import { encrypt,decrypt } from "@/utils/crypto";
 import Link from "next/link";
 
 export default async function EventsPage() {
   // Fetch from backend
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const encryptedApiKey =encrypt(apiKey)
   let events
   try {
       const res = await fetch("http://localhost:5000/v1/user/events", {
-    cache: "no-store",
+  method: "GET",
+  cache: "no-store",
+  headers: {
+    "Content-Type": "application/json",
+    "api-key": encryptedApiKey, // Replace with actual key
+ 
+  },
   });
 
   // Decrypt the response

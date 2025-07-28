@@ -1101,7 +1101,7 @@ async checkBookingStatus(request_data, user_id) {
         const selectQuery = `
             SELECT quantity, id FROM tbl_order 
             WHERE is_active = 1 AND is_deleted = 0 
-            AND status = 'pending' AND order_type = 'buy_tickets' 
+            AND status = 'pending' AND order_type = 'buy-tickets' 
             AND user_id = ? AND event_id = ? LIMIT 1
         `;
         const [response] = await db.query(selectQuery, [user_id, event_id]);
@@ -1124,7 +1124,7 @@ async checkBookingStatus(request_data, user_id) {
 
         const totalBooked = res1[0].total_booked || 0;
 
-        if (totalBooked >= 10) {
+        if (totalBooked > 10) {
             return {
                 code: 45,
                 message: { keyword: `You can purchase only ${10 - totalBooked} tickets` },
@@ -1149,8 +1149,6 @@ async checkBookingStatus(request_data, user_id) {
         };
     }
 }
-
-
 async createOrder(request_data,user_id){
     try {
         console.log(request_data);
@@ -1627,10 +1625,11 @@ async totalUser(){
         let selsctquery= 'SELECT COUNT(*) AS total_active_verified_users FROM tbl_user WHERE is_active = 1 AND is_verified = 1 AND is_deleted = 0;'
         let [response] = await db.query(selsctquery)
         if(response && response.length!=0){
+            let users = String(response[0].total_active_verified_users)
             return({
                 code:responsecode.SUCCESS,
                 message:{keyword:'recieved'},
-                data:response[0].total_active_verified_users,
+                data:users,
                 status:200
             })
         }
@@ -1658,10 +1657,11 @@ FROM tbl_event
  WHERE is_active = 1  AND is_deleted = 0 and is_approved=1`
         let [response] = await db.query(selsctquery)
         if(response && response.length!=0){
+            let events = String(response[0].total_events)
             return({
                 code:responsecode.SUCCESS,
                 message:{keyword:'recieved'},
-                data:response[0].total_events,
+                data:events,
                 status:200
             })
         }
@@ -1689,10 +1689,11 @@ FROM tbl_event
  WHERE is_active = 1  AND is_deleted = 0 and is_approved=1 and is_featured =1`
         let [response] = await db.query(selsctquery)
         if(response && response.length!=0){
+            let fevents = String(response[0].total_featured)
             return({
                 code:responsecode.SUCCESS,
                 message:{keyword:'recieved'},
-                data:response[0].total_featured,
+                data:fevents,
                 status:200
             })
         }
@@ -1718,10 +1719,11 @@ async tottalticketssold(){
         let selsctquery= `SELECT sum(quantity) as total_tickets from tbl_order where status = 'paid' and order_type='buy-tickets'`
         let [response] = await db.query(selsctquery)
         if(response && response.length!=0){
+            let tickets =String(response[0].total_tickets)
             return({
                 code:responsecode.SUCCESS,
                 message:{keyword:'recieved'},
-                data:response[0].total_tickets,
+                data:tickets,
                 status:200
             })
         }

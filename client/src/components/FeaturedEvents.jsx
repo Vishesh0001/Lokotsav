@@ -16,15 +16,23 @@ import {
 } from "@/components/ui/carousel"
 import BookmarkButton from "./BookmarkButton";
 import {Frown, MapPin, Sparkles, Users, Clock, IndianRupee, ArrowRight } from "lucide-react";
-import { decrypt } from "@/utils/crypto";
+import { decrypt, encrypt } from "@/utils/crypto";
 import Link from "next/link";
 
 export default async function EventsPage() {
   // Fetch from backend
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const encryptedApiKey =encrypt(apiKey)
   let events
   try {
       const res = await fetch("http://localhost:5000/v1/user/featuredEvents", {
-    cache: "no-store",
+   next: { revalidate: 300 }, // cache for 5 minutes
+    method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "api-key": encryptedApiKey, // Replace with actual key
+ 
+  },
   });
 
   // Decrypt the response
@@ -110,6 +118,7 @@ export default async function EventsPage() {
                         className="rounded-t-2xl w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
                         src={event.cover_image}
                         alt="event cover"
+                        loading="lazy"
                       />
                     </div>
                     <div className="p-4">

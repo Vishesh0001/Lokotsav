@@ -14,67 +14,31 @@ export default function StatsSection() {
 
   useEffect(() => {
     
-    async function userStats() {
+    async function fetchStats() {
+      setLoading(true)
+      try {
+       const [usersRes, eventsRes, featuredRes, ticketsRes] = await Promise.all([
+        secureFetch('/totalusers',{},'GET'),
+        secureFetch('/totalevents',{},'GET'),
+        secureFetch('/totalfeatured',{},'GET'),
+        secureFetch('/totalticketssold',{},'GET'),
+      ]);
+
+      if(usersRes.code == 1) setActiveUsers(usersRes.data);
+      if(eventsRes.code == 1) setEventCount(eventsRes.data);
+      if(featuredRes.code == 1) setFeaturedEventCount(featuredRes.data);
+      if(ticketsRes.code == 1) setTicketsSold(ticketsRes.data);
+
+      setError(null);
       
-      try {
-          await new Promise(res => setTimeout(res, 5000));
-        let response = await secureFetch('/totalusers', {}, 'GET')
-        if (response.code == 1) {
-          setActiveUsers(response.data)
-        }
-        setLoading(false);
       } catch (err) {
         setError(err.message);
+     
+      }finally{
         setLoading(false);
       }
     }
-    
-    async function eventsStats() {
-      try {
-          await new Promise(res => setTimeout(res, 5000));
-        let response = await secureFetch('/totalevents', {}, 'GET')
-        if (response.code == 1) {
-          setEventCount(response.data)
-        }
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    }
-    
-    async function featuredStats() {
-      try {
-          await new Promise(res => setTimeout(res, 5000));
-        let response = await secureFetch('/totalfeatured', {}, 'GET')
-        if (response.code == 1) {
-          setFeaturedEventCount(response.data)
-        }
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    }
-    
-    async function ticketsStats() {
-      try {
-          await new Promise(res => setTimeout(res, 5000));
-        let response = await secureFetch('/totalticketssold', {}, 'GET')
-        if (response.code == 1) {
-          setTicketsSold(response.data)
-        }
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    }
-    
-    ticketsStats()
-    featuredStats()
-    eventsStats()
-    userStats();
+    fetchStats();
   }, []);
 
  if (loading) {

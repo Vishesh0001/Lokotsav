@@ -27,7 +27,7 @@ export async function middleware(request) {
 
   try {
     // Verify JWT
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'vishesh456');
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET );
     const { payload } = await jwtVerify(token, secret);
     const { r } = payload;
     const role = r;

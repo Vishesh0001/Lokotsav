@@ -53,7 +53,7 @@ generateOTP() {
   generateToken (Id, r) {
     return jwt.sign(
       { id: Id, r },
-      process.env.JWT_SECRET || 'vishesh456',
+      process.env.JWT_SECRET ,
       { expiresIn: '1d' }
     );
   }
