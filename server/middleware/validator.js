@@ -1,4 +1,4 @@
-const joi = require("joi")
+
 const responsecode = require("../utilities/response-error-code")
 
 class Validator{
@@ -8,7 +8,7 @@ class Validator{
         
         const {error} = await schema.validate(data,{abortEarly:true}) // this wiill be giving first erroe that appears
        if(error){
-        (error)
+   
         return{
           
             code: responsecode.OPERATION_FAILED,

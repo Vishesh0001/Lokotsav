@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
 
     try {
       const res = await secureFetch('/resetpassword',{id, newPassword},'POST')
-('qwqwqw',res);
+// ('qwqwqw',res);
 
       if (res.code ==1) {
         toast.success('Password reset successfully!');
@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
       }
 
     } catch (err) {
-      ('ererer',err.message);
+      // ('ererer',err.message);
       
       toast.error('Something went wrong. Please try later.');
     } finally {

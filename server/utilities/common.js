@@ -129,7 +129,7 @@ try{
 
 }
 catch(error){
-("error while removing token",error.message)
+// ("error while removing token",error.message)
 return false
 }
 }
@@ -146,7 +146,7 @@ async  getUserIdFromToken(req) {
 
 // (user_token)
   if (user_token==undefined) {
-    ("cannot find token");
+    // ("cannot find token");
     
       return -1;
   }else{
@@ -159,7 +159,7 @@ async  getUserIdFromToken(req) {
       // (result);
       
       if (result.length == 0) {
-        ("caonnot find id")
+        // ("caonnot find id")
           return -1;
       }else{
       return  result[0].user_id;}
@@ -168,9 +168,7 @@ async  getUserIdFromToken(req) {
       return -1;
   }}
 }
-async getBookmarkStatus(event_id){
-    
-}
+
 
 }
 module.exports = new Common();

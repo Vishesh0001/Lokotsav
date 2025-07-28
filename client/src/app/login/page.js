@@ -33,7 +33,7 @@ export default function Login() {
             router.push('/verify-otp')
           }
         }else{
-          ('visheeee',resposne);
+          // ('visheeee',resposne);
           
           const tokenExpiry = new Date(Date.now() + 24* 60 * 60 * 1000); // 5 hour
         Cookies.set("token", resposne.data.token, { expires: tokenExpiry, path: '/' });
@@ -46,7 +46,7 @@ export default function Login() {
       }
 
       } catch (error) {
-        ("error in login page", error.message);
+        // ("error in login page", error.message);
        toast.error(error.message)
         // alert(error.message);
       } finally {

@@ -1,6 +1,6 @@
 import secureFetch from "@/utils/securefetch";
 
-import { toast } from "sonner";
+
 import {
   Card,
   CardAction,
@@ -34,7 +34,7 @@ let events;
 return(<div>no events found</div>)
        }
         }catch(error){
-          (error.message);
+     alert(error.message)
           
 return(<div>something went wrong</div>)
         }

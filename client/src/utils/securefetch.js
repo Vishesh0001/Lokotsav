@@ -19,7 +19,7 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       const { payload } = await jwtVerify(cookietoken, secret);
       const { r } = payload;
       const role = r;
-      ('role', role);
+      // ('role', role);
 
       // Set baseURL to admin if the user is an admin and the route is admin-specific
       if (role == 'admin' || isAdminRoute) {
@@ -74,7 +74,7 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       };
     }
 
-    ('reqOptions', reqOptions);
+    // ('reqOptions', reqOptions);
 
     const res = await axios(reqOptions);
     if(!res.data){

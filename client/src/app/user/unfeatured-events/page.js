@@ -55,7 +55,7 @@ export default function UnfeaturedEvents(){
     async function handlefeatureorder(id){
         try {
             const res = await secureFetch('/featureorder',{id},'POST')
-            ('er',res);
+            // ('er',res);
             
             if(res.code==1){
                 const order_id = res.data

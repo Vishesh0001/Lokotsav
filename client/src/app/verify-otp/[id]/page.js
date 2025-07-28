@@ -91,9 +91,9 @@ toast.warning('Enter OTP of 6 digits')
       });
 
       const result = await res.json();
-('ressss',result
+// ('ressss',result
 
-);
+// );
 
       if (result.code == 1) {
         toast.success('OTP resent successfully');

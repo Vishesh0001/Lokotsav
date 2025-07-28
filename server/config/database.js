@@ -20,7 +20,7 @@ const pool = mysql.createPool({
 
 pool.getConnection()
   .then((connection) => {
-    (" Database connected successfully");
+    // (" Database connected successfully");
     connection.release();
   })
   .catch((err) => {

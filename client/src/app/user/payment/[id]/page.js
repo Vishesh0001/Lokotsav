@@ -38,7 +38,7 @@ const router = useRouter();
     };
     getPaymentData();
   }, [id]);
-('psymentdaaa',paymentData);
+// ('psymentdaaa',paymentData);
 
   const validationSchema = Yup.object({
     cardNumber: Yup.string()
@@ -68,7 +68,7 @@ const router = useRouter();
         return;
       }
         const res1 = await secureFetch('/payment',{id},'POST')
-        ('payment res',res1)
+        // ('payment res',res1)
         if (res1.code == 1){
       await new Promise((res) => setTimeout(res, 2000));
    router.push('/user/payment/success')
