@@ -1,6 +1,6 @@
 # dependencies
 /node_modules
-
+/ca.pem
 .env
 # System
 .DS_Store
