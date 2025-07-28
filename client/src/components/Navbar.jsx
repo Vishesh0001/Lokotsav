@@ -54,7 +54,7 @@ export default function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     const query = new URLSearchParams();
-    console.log('sdsdsdsds',search,location);
+    ('sdsdsdsds',search,location);
     
     if(!search && !location){
     toast('Please enter a search keyword or Select any city')

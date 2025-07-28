@@ -12,7 +12,7 @@ let resdata;
 
 try {
     let response = await secureFetch('/event',{id},'POST')
-    // console.log(response);
+    // (response);
     
     if(response.code==1){
          resdata = await response.data

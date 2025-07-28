@@ -14,7 +14,7 @@ const UnapprovedEventsPage = () => {
     const fetchUnapprovedEvents = async () => {
       try {
         const res = await secureFetch('/unapproved', {}, 'GET',true);
-// console.log(res);
+// (res);
 
         if (res.code == 1) {
           setEvents(res.data || []);

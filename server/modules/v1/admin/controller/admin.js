@@ -8,7 +8,7 @@ class Admin{
 async createEvent(req,res){
     
         try {
-            // console.log(req.body);
+            // (req.body);
             
             const requestData = await common.decodeBody(req.body);
             const user_id = await common.getUserIdFromToken(req)
@@ -35,7 +35,7 @@ async deleteEvent(req,res){
   
   
     } catch (error) {
-      console.log("deletion error",error.message)
+      ("deletion error",error.message)
   return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
     }
   
@@ -45,7 +45,7 @@ async approveEvent(req,res){
     //   const requestData = req.body
       const requestData =await common.decodeBody(req.body);
 
-        // console.log(requestD/ata);
+        // (requestD/ata);
         
   
       const response = await adminModel.approveEvent(requestData);
@@ -54,7 +54,7 @@ async approveEvent(req,res){
   
   
     } catch (error) {
-      console.log("deletion error",error.message)
+      ("deletion error",error.message)
   return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
     }
   
@@ -62,12 +62,12 @@ async approveEvent(req,res){
 async userList(req,res){
     try {
         // let product_id = await common.decodeBody(req.body)
-        // console.log();
+        // ();
         
         let response = await adminModel.userList()
         common.sendResponse(req,res,response.code,response.message,response.data,response.status)
       } catch (error) {
-        console.log("controller eror",error.message)
+        ("controller eror",error.message)
         common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
         
       }
@@ -79,7 +79,7 @@ async blockUser(req, res) {
     const response = await adminModel.blockUser(requestData);
     return common.sendResponse(req, res, response.code, response.message, response.data, response.status);
   } catch (error) {
-    console.log("block user error:", error.message);
+    ("block user error:", error.message);
     return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {}, 500);
   }
 }
@@ -91,7 +91,7 @@ async deleteUser(req, res) {
     const response = await adminModel.deleteUser(requestData);
     return common.sendResponse(req, res, response.code, response.message, response.data, response.status);
   } catch (error) {
-    console.log("delete user error:", error.message);
+    ("delete user error:", error.message);
     return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {}, 500);
   }
 }
@@ -99,12 +99,12 @@ async deleteUser(req, res) {
 async unapprovedlist(req,res){
     try {
      
-        // console.log('hellooooooooooo');
+        // ('hellooooooooooo');
         
         let response = await adminModel.unapprovedEvents()
         common.sendResponse(req,res,response.code,response.message,response.data,response.status)
       } catch (error) {
-        console.log("controller eror",error.message)
+        ("controller eror",error.message)
         common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
         
       }
@@ -115,7 +115,7 @@ async getEventById(req, res) {
     const response = await adminModel.getEventById(requestData);
     return common.sendResponse(req, res, response.code, response.message, response.data, response.status);
   } catch (error) {
-    console.log('controller error', error.message);
+    ('controller error', error.message);
     return common.sendResponse(req, res, responsecode.SERVER_ERROR, { keyword: 'txt_server_error' }, null, 500);
   }
 }
@@ -126,7 +126,7 @@ async updateEvent(req, res) {
     const response = await adminModel.updateEvent(requestData);
     return common.sendResponse(req, res, response.code, response.message, response.data, response.status);
   } catch (error) {
-    console.log('controller error', error.message);
+    ('controller error', error.message);
     return common.sendResponse(req, res, responsecode.SERVER_ERROR, { keyword: 'txt_server_error' }, null, 500);
   }
 }

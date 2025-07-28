@@ -65,7 +65,7 @@ export default function AddEvent() {
     onSubmit: async (values, { resetForm }) => {
       // setloading(false)
       try {
-        console.log(values);
+        (values);
         const res = await secureFetch("/create-event", { ...values }, 'POST');
         if (res.code ==1) {
           resetForm();

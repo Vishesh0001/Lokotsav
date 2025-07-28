@@ -5,8 +5,9 @@ import axios from 'axios';
 
 const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
 const jwtSecret = process.env.JWT_SECRET ;
-const userBaseURL = 'http://localhost:5000/v1/user';
-const adminBaseURL = 'http://localhost:5000/v1/admin';
+const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
+const userBaseURL = `${BaseURL}/v1/user`;
+const adminBaseURL = `${BaseURL}/v1/admin`;
 const validStatusCodes = [200, 201, 400,401, 403, 404, 409, 410, 500];
 const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false) => {
   try {
@@ -18,7 +19,7 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       const { payload } = await jwtVerify(cookietoken, secret);
       const { r } = payload;
       const role = r;
-      console.log('role', role);
+      ('role', role);
 
       // Set baseURL to admin if the user is an admin and the route is admin-specific
       if (role == 'admin' || isAdminRoute) {
@@ -37,10 +38,10 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       encryptedToken = encrypt(token);
     }
 
-    // console.log('encrypted token', encryptedToken);
+    // ('encrypted token', encryptedToken);
 
     const receivedData = JSON.stringify(data);
-    // console.log(receivedData);
+    // (receivedData);
     
     const encryptedData = encrypt(receivedData);
 
@@ -73,11 +74,11 @@ const secureFetch = async (url, data = {}, method = 'POST', isAdminRoute = false
       };
     }
 
-    console.log('reqOptions', reqOptions);
+    ('reqOptions', reqOptions);
 
     const res = await axios(reqOptions);
     if(!res.data){
-      // console.log('res.data nto found',res)
+      // ('res.data nto found',res)
       throw new Error('No data returned from the server')
     }
     const encryptedText = res.data;

@@ -10,9 +10,9 @@ export default function VerifyCodePage() {
   const router = useRouter();
   let { id } = useParams();
   id = decrypt(id)
-  console.log('dsxcxccx',id);
+  ('dsxcxccx',id);
   let encyotedid = encrypt(String(id))
-  console.log('enssss',encyotedid);
+  ('enssss',encyotedid);
   
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);

@@ -31,7 +31,7 @@ const router = useRouter();
 
     try {
 let response = await secureFetch('/forgotpassword',{email},'POST')
- console.log(response);
+ (response);
  if(response.code==1){
 let user_id  = response.data
 let encuid = encrypt(String(user_id))

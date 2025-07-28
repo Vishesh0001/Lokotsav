@@ -18,13 +18,14 @@ import { useEffect, useState, useCallback } from 'react';
 
 export default function EventsPage() {
     const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+    const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const encryptedApiKey =encrypt(apiKey)
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch("http://localhost:5000/v1/user/events", {
+      const res = await fetch(`${BaseURL}/v1/user/events`, {
        
       method: "GET",
   cache: "no-store",

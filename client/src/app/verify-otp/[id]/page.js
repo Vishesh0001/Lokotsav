@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 const RESEND_TIMEOUT = 150; // 2.5 minutes in seconds
 const MAX_RESEND_ATTEMPTS = 3;
   const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const encryptedApiKey =encrypt(apiKey)
 export default function VerifyOtpPage() {
   const [otp, setOtp] = useState('');
@@ -43,7 +44,7 @@ toast.warning('Enter OTP of 6 digits')
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/v1/user/verifyotp', {
+      const res = await fetch(`${BaseURL}/v1/user/verifyotp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ toast.warning('Enter OTP of 6 digits')
     }
         setResendLoading(true);
            try {
-      const res = await fetch('http://localhost:5000/v1/user/resendotp', {
+      const res = await fetch(`${BaseURL}/v1/user/resendotp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ toast.warning('Enter OTP of 6 digits')
       });
 
       const result = await res.json();
-console.log('ressss',result
+('ressss',result
 
 );
 

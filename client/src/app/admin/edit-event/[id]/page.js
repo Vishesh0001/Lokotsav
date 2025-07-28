@@ -12,7 +12,7 @@ export default function EditEventPage() {
   const { id } = useParams();
   const router = useRouter();
   const [eventData, setEventData] = useState(null);
-console.log('id',id);
+('id',id);
 
   useEffect(() => {
     const fetchEvent = async () => {

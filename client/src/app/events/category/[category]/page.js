@@ -25,7 +25,7 @@ let events;
        const response=  await secureFetch('/category',{v},'POST')
        if(response.code==1){
             events = response.data;
-        //    console.log('cat',events);
+        //    ('cat',events);
         if(response.data.length==0){
           return ( <div className="text-center text-gray-500 mt-10 text-lg">No events created in {v}</div>)
         }
@@ -34,7 +34,7 @@ let events;
 return(<div>no events found</div>)
        }
         }catch(error){
-          console.log(error.message);
+          (error.message);
           
 return(<div>something went wrong</div>)
         }

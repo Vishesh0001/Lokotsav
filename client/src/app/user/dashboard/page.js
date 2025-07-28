@@ -41,10 +41,10 @@ useEffect( () => {
      try{
         const response = await secureFetch("/getBookmarkedEvents",{},'GET')
         if(response.code==1){
-            // console.log("res data",response.data);
+            // ("res data",response.data);
             
           setBookmarkedEvents(response.data)
-          // console.log('hook',bookmarkedEvnets);
+          // ('hook',bookmarkedEvnets);
           
         }else{
                <div className="w-200 mx-auto m-7 p-6 border rounded-2xl shadow-md bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center h-64">
@@ -61,10 +61,10 @@ useEffect( () => {
      try{
         const response = await secureFetch("/approved",{},'GET')
         if(response.code==1){
-            // console.log("res data",response.data);
+            // ("res data",response.data);
             
           setApprovedEvents(response.data)
-          // console.log('hook',bookmarkedEvnets);
+          // ('hook',bookmarkedEvnets);
           
         }else{
                <div className="w-200 mx-auto m-7 p-6 border rounded-2xl shadow-md bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center h-64">
@@ -81,10 +81,10 @@ useEffect( () => {
      try{
         const response = await secureFetch("/unapproved",{},'GET')
         if(response.code==1){
-            // console.log("res data",response.data);
+            // ("res data",response.data);
             
           setUnApprovedEvents(response.data)
-          // console.log('hook',bookmarkedEvnets);
+          // ('hook',bookmarkedEvnets);
           
         }else{
                <div className="w-200 mx-auto m-7 p-6 border rounded-2xl shadow-md bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center h-64">
@@ -101,8 +101,8 @@ useEffect( () => {
     getBookmark();
     getApprovedEvents()
 },[])
-// console.log("Approved Event IDs:", approvedEvents.map(e => e.id));
-console.log(bookmarkedEvnets);
+// ("Approved Event IDs:", approvedEvents.map(e => e.id));
+(bookmarkedEvnets);
 
 
 return(

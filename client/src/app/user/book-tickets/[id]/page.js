@@ -39,7 +39,7 @@ useEffect(() => {
  const checkBookingStatus = async () => {
   try {
     const response = await secureFetch(`/booking-status`, { id }, "POST");
-    console.log("Booking Status Response:", response);
+    ("Booking Status Response:", response);
 
     if (!response || !response.code) {
       toast.error("Unexpected response from server");

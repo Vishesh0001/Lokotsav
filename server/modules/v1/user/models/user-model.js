@@ -7,8 +7,8 @@ const sendEmail = require("../../../../utilities/sendEmail")
  class UserModel{
 async signup(request_data){ 
     try{
-        // console.log("signup entered")
-        // console.log("data",request_data);
+        // ("signup entered")
+        // ("data",request_data);
         
         const checkUniqueEmail = await common.checkEmail(request_data.email)
         if(!checkUniqueEmail){
@@ -22,8 +22,8 @@ async signup(request_data){
             }
             const insertQuery = `insert into tbl_user set ?`
             const [queryResponse] = await db.query(insertQuery,[userData])
-            // console.log(insertQuery)
-            // console.log(queryResponse)
+            // (insertQuery)
+            // (queryResponse)
             if(queryResponse.affectedRows==0){
                 return({
                     code: responsecode.OPERATION_FAILED,
@@ -72,7 +72,7 @@ async signup(request_data){
             })
         }
     }catch(error){
-        console.log(error)
+        (error)
         return({
             code: responsecode.SERVER_ERROR,
             message: {keyword: "internal_server_error"},
@@ -83,7 +83,7 @@ async signup(request_data){
 }
 async verifyOTP(request_data) {
     try {
-        console.log(request_data);
+        (request_data);
         
         const otp = request_data.otp;
 
@@ -151,7 +151,7 @@ async verifyOTP(request_data) {
 }
 async resendOTP(user_id){
 try {
-    // console.log('uuuuuuis',user_id);
+    // ('uuuuuuis',user_id);
     let id = user_id.id
    let deactivateOtpQuery =`update tbl_otp set is_active = 0, is_delete=1 where user_id = ? and is_active =1 and is_delete=0`
    let [res] = await db.query(deactivateOtpQuery,[id])
@@ -223,7 +223,7 @@ status:400
     })
    }
 } catch (error) {
-    console.log(error);
+    (error);
     
         return({
             code: responsecode.SERVER_ERROR,
@@ -238,13 +238,13 @@ async login(request_data){
         let email = request_data.email
 
         let selectQuery = `select id,role,email,password,is_active,is_deleted,is_verified from tbl_user where email = ? order by id desc limit 1`
-        // console.log("query",selectQuery);
+        // ("query",selectQuery);
         
         const [response] = await db.query(selectQuery, email)
-        // console.log("res",response);
+        // ("res",response);
         
         let userInfo = response[0];
-        // console.log("userinfo",userInfo);
+        // ("userinfo",userInfo);
         
         if (userInfo) {
             if (userInfo.is_active == 1) {
@@ -318,7 +318,7 @@ async login(request_data){
             })
         }
     } catch (error) {
-        console.log("user model error", error.message)
+        ("user model error", error.message)
         return ({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -329,13 +329,13 @@ async login(request_data){
 }
 async logout(userId){
     try {
-        console.log("entered logout")
+        ("entered logout")
         // let updatequery =`update tbl_user set is_login= 0 where id=?`
         // let response = await db.query(updatequery,userId)
         // if(response.affectedRows!=0){
         let tokenresponse = await common.removeToken(userId)
         if(tokenresponse){
-            console.log("logged out");
+            ("logged out");
             
             return({
                 code: responsecode.SUCCESS,
@@ -360,7 +360,7 @@ async logout(userId){
         //     })
         // }
     } catch (error) {
-        console.log("server error in model", error.message)
+        ("server error in model", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -409,7 +409,7 @@ if(resp && resp.lenght!=0){
     
     }
 } catch (error) {
-    console.log(error);
+    (error);
     
         return({
             code: responsecode.SERVER_ERROR,
@@ -609,7 +609,7 @@ async eventListing(){
         let selectQuery = `select * from tbl_event where is_active=1 and is_deleted=0 and is_approved=1`
         let [response] = await db.query(selectQuery);
         if(response && response.length > 0){
-            // console.log('response',response);
+            // ('response',response);
             
             return({
                 code: responsecode.SUCCESS,
@@ -626,7 +626,7 @@ async eventListing(){
             })
         }
     } catch (error) {
-        console.log("model error", error.message)
+        ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -637,12 +637,12 @@ async eventListing(){
 }
 async displayEvent(eventId){
     try {
-        // console.log("uuuuuuuuuuuuuuuuu",eventId);
+        // ("uuuuuuuuuuuuuuuuu",eventId);
         
         let selectQuery = `select * from tbl_event where is_active=1 and is_deleted=0 and id = ?`
         let [response] = await db.query(selectQuery, eventId.id);
         if(response && response.length > 0){
-            // console.log(response);
+            // (response);
             
             return({
                 code: responsecode.SUCCESS,
@@ -659,7 +659,7 @@ async displayEvent(eventId){
             })
         }
     } catch (error) {
-        console.log("model error", error.message)
+        ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -673,7 +673,7 @@ async featuredEvents(){
         let selectQuery = `select id,is_featured,event_title,category,start_time,city,description,location,registrations,cover_image from tbl_event where is_active=1 and is_deleted=0 and is_approved=1 and is_featured=1 order by start_time limit 10`
         let [response] = await db.query(selectQuery);
         if(response && response.length > 0){
-            // console.log('response',response);
+            // ('response',response);
             
             return({
                 code: responsecode.SUCCESS,
@@ -690,7 +690,7 @@ async featuredEvents(){
             })
         }
     } catch (error) {
-        console.log("model error", error.message)
+        ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -701,15 +701,15 @@ async featuredEvents(){
 }
 async getBookmarkStatus(event_id, user_id){
     try {
-        // console.log(user_id);
-        // console.log(event_id.event_id);
+        // (user_id);
+        // (event_id.event_id);
         
         let Selectquery = `select is_bookmarked from tbl_event_bookmark where event_id = ? and user_id=?`
         let [responsee] = await db.query(Selectquery, [event_id.event_id, user_id]) 
-        // console.log('res2',responsee);
+        // ('res2',responsee);
         
         let response = responsee[0]
-        // console.log('res',response);
+        // ('res',response);
         
         if(response){
             return ({
@@ -727,7 +727,7 @@ async getBookmarkStatus(event_id, user_id){
             })
         }
     } catch (error) {
-        console.log("model error", error.message)
+        ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -738,8 +738,8 @@ async getBookmarkStatus(event_id, user_id){
 }
 async bookmark(event_id, user_id) {
     try {
-        // console.log("event_id:", event_id);
-        // console.log("user_id:", user_id);
+        // ("event_id:", event_id);
+        // ("user_id:", user_id);
 
         const selectQuery = `
             SELECT is_bookmarked 
@@ -747,8 +747,8 @@ async bookmark(event_id, user_id) {
             WHERE event_id = ? AND user_id = ?
         `;
         const [rows] = await db.query(selectQuery, [event_id.event_id, user_id]);
-        // console.log("Select Query:", selectQuery);
-        // console.log("Query Result:", rows);
+        // ("Select Query:", selectQuery);
+        // ("Query Result:", rows);
 
         let updateQuery;
         let queryParams;
@@ -791,7 +791,7 @@ async bookmark(event_id, user_id) {
         }
 
     } catch (error) {
-        console.log("model error:", error.message);
+        ("model error:", error.message);
         return {
             code: responsecode.SERVER_ERROR,
             message: { keyword: "txt_server_error" },
@@ -802,7 +802,7 @@ async bookmark(event_id, user_id) {
 }
 async createEvent (requestData,user_id){
     try {
-        // console.log(requestData)
+        // (requestData)
             let insertQuery = `insert into tbl_event set ?`
     //         `    INSERT INTO tbl_product (category_id, product_name, price, description, image)
     //     VALUES (?, ?, ?, ?, ?)
@@ -825,9 +825,9 @@ async createEvent (requestData,user_id){
                
             }
             let [response] = await db.query(insertQuery,[eventData])
-            // console.log(insertQuery);
+            // (insertQuery);
             
-            // console.log(response);
+            // (response);
             
             if(response.affectedRows!=0){
                  return({
@@ -845,7 +845,7 @@ async createEvent (requestData,user_id){
                     })
             }
         } catch (error) {
-            console.log("modle error",error.message)
+            ("modle error",error.message)
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
@@ -856,7 +856,7 @@ async createEvent (requestData,user_id){
 }
 async getBookmarkedEvents(user_id){
         try {
-            // console.log(user_id);
+            // (user_id);
             
             let Selectquery = `SELECT e.*
 FROM tbl_event e
@@ -868,7 +868,7 @@ WHERE eb.user_id = ?
   AND eb.is_active = 1;`
             let [responsee]  = await db.query(Selectquery,[user_id]) 
             let response = responsee
-            // console.log(response);
+            // (response);
             
            if(response){
             // let eventData = await this.displayEvent(response)
@@ -887,7 +887,7 @@ WHERE eb.user_id = ?
             })
         }
         } catch (error) {
-            console.log('server error',error.message);
+            ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -899,7 +899,7 @@ WHERE eb.user_id = ?
 }
 async getsubmitted(user_id){
         try {
-            console.log(user_id);
+            (user_id);
             
             let Selectquery = `SELECT e.*
 FROM tbl_event e
@@ -907,7 +907,7 @@ JOIN tbl_user u ON e.user_id = u.id
 WHERE u.role = 'user'and u.id=?;`
             let [responsee]  = await db.query(Selectquery,[user_id]) 
             let response = responsee
-            console.log(response);
+            (response);
             
            if(response){
             // let eventData = await this.displayEvent(response)
@@ -936,7 +936,7 @@ WHERE u.role = 'user'and u.id=?;`
 }
 async searchEvent(searchTerm){
     try {
-        console.log("search term",searchTerm);
+        ("search term",searchTerm);
         let selectQuery = `SELECT * FROM tbl_event WHERE is_active=1 AND is_deleted=0 and is_approved=1`;
         let params = [];
 
@@ -950,16 +950,16 @@ if (searchTerm.city) {
 }
 
 // 
-        // console.log("Final SQL Query:", selectQuery);
-        // console.log("With Params:", params);
+        // ("Final SQL Query:", selectQuery);
+        // ("With Params:", params);
 // 
         let [response] = await db.query(selectQuery, params);
-        // console.log("Search Result:", response);
-    //    console.log("Final SQL Query:", selectQuery);
-    //    console.log("Search Term Passed:", `%${searchTerm.event_title}%`);
+        // ("Search Result:", response);
+    //    ("Final SQL Query:", selectQuery);
+    //    ("Search Term Passed:", `%${searchTerm.event_title}%`);
        
        if(response){
-        // console.log("search displayed",response[0]);
+        // ("search displayed",response[0]);
 return({
     
     
@@ -978,7 +978,7 @@ return({
         })
        }
     } catch (error) {
-        console.log("modle error",error.message)
+        ("modle error",error.message)
         return({
             code:responsecode.SERVER_ERROR,
             message:{keyword:"txt_server_error"},
@@ -989,12 +989,12 @@ return({
 }
 async approvedEvents(user_id){
          try {
-            // console.log(user_id);
+            // (user_id);
             
             let Selectquery = `select id,event_title, category, start_time,end_time,city,cover_image,cultural_significance,tips,description,location,registrations from tbl_event where user_id= ? and is_active=1 and is_deleted=0 and is_approved=1;`
             let [responsee]  = await db.query(Selectquery,[user_id]) 
             let response = responsee
-            // console.log(response);
+            // (response);
             
            if(response){
             // let eventData = await this.displayEvent(response)
@@ -1013,7 +1013,7 @@ async approvedEvents(user_id){
             })
         }
         } catch (error) {
-            console.log('server error',error.message);
+            ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1025,12 +1025,12 @@ async approvedEvents(user_id){
 }
 async UnapprovedEvents(user_id){
          try {
-            // console.log(user_id);
+            // (user_id);
             
             let Selectquery = `select id,event_title, category, start_time,city,cover_image,description,location,registrations from tbl_event where user_id= ? and is_active=1 and is_deleted=0 and is_approved=0;`
             let [responsee]  = await db.query(Selectquery,[user_id]) 
             let response = responsee
-            // console.log(response);
+            // (response);
             
            if(response){
             // let eventData = await this.displayEvent(response)
@@ -1049,7 +1049,7 @@ async UnapprovedEvents(user_id){
             })
         }
         } catch (error) {
-            console.log('server error',error.message);
+            ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1061,12 +1061,12 @@ async UnapprovedEvents(user_id){
 }
 async category(request_data){
     try {
-        // console.log(request_data);
+        // (request_data);
         
         const selectQuery = `select id,category,event_title,cover_image,start_time,description,city,location,is_featured,registrations from tbl_event where is_active=1 and is_deleted=0 and is_approved=1 and category=?`
         const [response] =await db.query(selectQuery,[request_data.v])
         if(response){
-            // console.log(response);
+            // (response);
             
             return({
                 code:responsecode.SUCCESS,
@@ -1084,7 +1084,7 @@ async category(request_data){
         }
 
     } catch (error) {
-         console.log('server error',error.message);
+         ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1140,7 +1140,7 @@ async checkBookingStatus(request_data, user_id) {
             status: 200
         };
     } catch (error) {
-        console.log("Server Error:", error.message);
+        ("Server Error:", error.message);
         return {
             code: responsecode.SERVER_ERROR,
             message: { keyword: "Server error occurred" },
@@ -1151,11 +1151,11 @@ async checkBookingStatus(request_data, user_id) {
 }
 async createOrder(request_data,user_id){
     try {
-        console.log(request_data);
+        (request_data);
       let event_id = request_data.event_id;
                      let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status = 'paid' and user_id=? and event_id=? and order_type='buy-tickets'`
             let [res1] = await db.query(ticketsBooked,[user_id,event_id])
-            console.log('weew',res1);
+            ('weew',res1);
             let final_total_tickets = Number(res1[0].total_booked)+Number(request_data.quantity)
             if(final_total_tickets > 10){
                 return ({
@@ -1178,7 +1178,7 @@ async createOrder(request_data,user_id){
   total_amount,
   order_type
 });
-       console.log(insertQuery);
+       (insertQuery);
        let order_id = response.insertId
         if(response.affectedRows==0){
             return ({
@@ -1197,7 +1197,7 @@ async createOrder(request_data,user_id){
         }
 
     } catch (error) {
-        console.log("server errror",error.message);
+        ("server errror",error.message);
         
             return({
                    code:responsecode.SERVER_ERROR,
@@ -1209,7 +1209,7 @@ async createOrder(request_data,user_id){
 }
 async updateOrder(request_data) {
     try {
-        console.log(request_data);
+        (request_data);
         
         let id = request_data.order_id;
         let total_amount = request_data.total_amount;
@@ -1234,11 +1234,11 @@ async updateOrder(request_data) {
             `;
 
             let [bookedResult] = await db.query(ticketsBooked, [user_id, event_id]);
-            console.log('weew', bookedResult);
+            ('weew', bookedResult);
 let final_total_tickets = Number(bookedResult[0].total_booked) + Number(quantity)
 
             if (final_total_tickets > 10) {
-                console.log(final_total_tickets);
+                (final_total_tickets);
                 
                 return {
                     code: responsecode.OPERATION_FAILED,
@@ -1274,7 +1274,7 @@ let final_total_tickets = Number(bookedResult[0].total_booked) + Number(quantity
         }
 
     } catch (error) {
-        console.log(error);
+        (error);
 
         return {
             code: responsecode.SERVER_ERROR,
@@ -1317,7 +1317,7 @@ JOIN
             }
          
     } catch (error) {
-        //    console.log("server errror",error.message);
+        //    ("server errror",error.message);
         
             return({
                    code:responsecode.SERVER_ERROR,
@@ -1461,12 +1461,12 @@ async payment(request_data) {
 }
 async getEventsForFeature(user_id){
          try {
-            // console.log(user_id);
+            // (user_id);
             
             let Selectquery = `select id,event_title, category, start_time,end_time,city,cover_image,cultural_significance,tips,description,location,registrations from tbl_event where user_id= ? and is_active=1 and is_deleted=0 and is_approved=1 and is_featured=0;`
             let [responsee]  = await db.query(Selectquery,[user_id]) 
             let response = responsee
-            // console.log(response);
+            // (response);
             
            if(response){
             // let eventData = await this.displayEvent(response)
@@ -1485,7 +1485,7 @@ async getEventsForFeature(user_id){
             })
         }
         } catch (error) {
-            console.log('server error',error.message);
+            ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1562,7 +1562,7 @@ ORDER BY p.payment_time DESC;
             })
         }
     } catch (error) {
-        console.log('server err',error);
+        ('server err',error);
         
                return({
                 code:responsecode.SERVER_ERROR,

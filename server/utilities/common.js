@@ -23,19 +23,19 @@ class Common{
   
  async decrypt(data) {
     try {
-      // console.log('data',data)
-      // console.log('key',key);
-      // console.log('iv',iv);
+      // ('data',data)
+      // ('key',key);
+      // ('iv',iv);
       
       
       if (!data) return {};
       const decipher =  crypto.createDecipheriv('aes-256-cbc', key, iv);
-      // console.log("decipher",decipher)
+      // ("decipher",decipher)
       let decrypted = decipher.update(data, 'hex', 'utf8');
-      // console.log("dec",decrypted);
+      // ("dec",decrypted);
       
       decrypted += decipher.final('utf8');
-      // console.log("dec",decrypted);
+      // ("dec",decrypted);
       try {
         let data = await JSON.parse(decrypted);
         return data
@@ -64,13 +64,13 @@ generateOTP() {
   `;
   try {
     let [response]= await db.query(query, [userId, token]);
-    // console.log(response)
+    // (response)
     if(response.affectedRows==0){
         return false
     }else {return true}
   } catch (error) {
     // throw new Error('Token storage failed: ' + error.message);
-    console.log(error.message)
+    (error.message)
     return false;
   }
 }
@@ -84,13 +84,13 @@ generateOTP() {
   return code;
 }
   async decodeBody(Adata){
-    // console.log(Adata);
+    // (Adata);
     let responseData = Adata.data
-    // console.log(responseData);
+    // (responseData);
     
     // let dataa = await data.data.json()
     let decryptedData = await this.decrypt(responseData);
-    // console.log("decreptted data in decode boduy",decryptedData);
+    // ("decreptted data in decode boduy",decryptedData);
     
     return decryptedData;
     // return data
@@ -129,24 +129,24 @@ try{
 
 }
 catch(error){
-console.log("error while removing token",error.message)
+("error while removing token",error.message)
 return false
 }
 }
 async  getUserIdFromToken(req) {
-  // console.log(req);
+  // (req);
   
   const token = await req.headers['token'];
-  // console.log("token",token);
+  // ("token",token);
   
   const user_token = await this.decrypt(token)
 // let user_token =  await this.decodeBody(token)
-// console.log("decpt token",decryptedToken);
-// console.log("dec token",user_token);
+// ("decpt token",decryptedToken);
+// ("dec token",user_token);
 
-// console.log(user_token)
+// (user_token)
   if (user_token==undefined) {
-    console.log("cannot find token");
+    ("cannot find token");
     
       return -1;
   }else{
@@ -156,10 +156,10 @@ async  getUserIdFromToken(req) {
   try {
       const resultt = await db.query(query, user_token);
       let result = resultt[0]
-      // console.log(result);
+      // (result);
       
       if (result.length == 0) {
-        console.log("caonnot find id")
+        ("caonnot find id")
           return -1;
       }else{
       return  result[0].user_id;}

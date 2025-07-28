@@ -37,5 +37,5 @@ try {
   });
 } 
 catch (error) {
-  console.log("Error in server:" + error);
+  ("Error in server:" + error);
 }

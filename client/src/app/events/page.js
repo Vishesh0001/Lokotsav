@@ -15,10 +15,11 @@ import Link from "next/link";
 export default async function EventsPage() {
   // Fetch from backend
     const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+    const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const encryptedApiKey =encrypt(apiKey)
   let events
   try {
-      const res = await fetch("http://localhost:5000/v1/user/events", {
+      const res = await fetch(`${BaseURL}/v1/user/events`, {
   method: "GET",
   cache: "no-store",
   headers: {
@@ -29,10 +30,10 @@ export default async function EventsPage() {
   });
 
   // Decrypt the response
-  // console.log('ere',res);
+  // ('ere',res);
   
   const responseText = await res.text();
-  // console.log('sss',responseText);
+  // ('sss',responseText);
   
   const decrypteddata = decrypt(responseText);
    events = decrypteddata.data;

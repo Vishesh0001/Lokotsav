@@ -26,7 +26,7 @@ const router = useRouter();
     const getPaymentData = async () => {
       try {
         const response = await secureFetch('/payment-data', { id }, 'POST');
-        // console.log('asdasdadad',response)
+        // ('asdasdadad',response)
         if (response.code == 1) {
        setPaymentData(response.data[0]);
         } else {
@@ -38,7 +38,7 @@ const router = useRouter();
     };
     getPaymentData();
   }, [id]);
-console.log('psymentdaaa',paymentData);
+('psymentdaaa',paymentData);
 
   const validationSchema = Yup.object({
     cardNumber: Yup.string()
@@ -68,7 +68,7 @@ console.log('psymentdaaa',paymentData);
         return;
       }
         const res1 = await secureFetch('/payment',{id},'POST')
-        console.log('payment res',res1)
+        ('payment res',res1)
         if (res1.code == 1){
       await new Promise((res) => setTimeout(res, 2000));
    router.push('/user/payment/success')

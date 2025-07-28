@@ -9,14 +9,15 @@ import { Button } from "./ui/button";
 export default function Logout() {
   const router = useRouter();
   const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
+  const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const encryptedApiKey =encrypt(apiKey)
   async function handleLogout() {
     const token = Cookies.get("token");
     const encryptedToken = encrypt(token)
-    // console.log("token", token);
+    // ("token", token);
 
     try {
-      const response = await fetch('http://localhost:5000/v1/user/logout', {
+      const response = await fetch(`${BaseURL}/v1/user/logout`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -25,13 +26,13 @@ export default function Logout() {
 
         },
       });
-console.log(response);
+// (response);
 
    
       if (response.status == 200) {
-        // console.log('Before logout:', Cookies.get('token'));
+        // ('Before logout:', Cookies.get('token'));
         Cookies.remove('token', { path: '/' });
-        // console.log('After logout:', Cookies.get('token'));
+        // ('After logout:', Cookies.get('token'));
         //  Cookies.remove("token",{path:'/'});
        toast.success('logout success!')
         router.push("/login");

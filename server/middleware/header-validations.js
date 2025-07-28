@@ -3,10 +3,10 @@ const common = require('../utilities/common');
 
 async function validateApiKey(req, res, next) {
   const incomingApiKey1 = req.headers['api-key'];
-//   console.log(req.headers)
+//   (req.headers)
   const incomingApiKey = await common.decrypt(incomingApiKey1);
-// console.log(incomingApiKey);
-// console.log(incomingApiKey1);
+// (incomingApiKey);
+// (incomingApiKey1);
 
   if (!incomingApiKey) {
     const response = {

@@ -36,10 +36,10 @@ export default function UnfeaturedEvents(){
             try{
               const response = await secureFetch("/unfeatured",{},'GET')
         if(response.code==1){
-            // console.log("res data",response.data);
+            // ("res data",response.data);
             
           setunFeatured(response.data)
-          // console.log('hook',bookmarkedEvnets);
+          // ('hook',bookmarkedEvnets);
           
         }else{
               setunFeatured([])
@@ -55,7 +55,7 @@ export default function UnfeaturedEvents(){
     async function handlefeatureorder(id){
         try {
             const res = await secureFetch('/featureorder',{id},'POST')
-            console.log('er',res);
+            ('er',res);
             
             if(res.code==1){
                 const order_id = res.data

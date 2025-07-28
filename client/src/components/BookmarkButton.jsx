@@ -20,7 +20,7 @@ const [Loading,setLoading] = useState(true)
         if (!token) return; // Don't check if not logged in
         
         const response = await secureFetch('/getbookmark', { event_id }, 'POST');
-        // console.log('erwerwerwer',response);
+        // ('erwerwerwer',response);
         
         if (response.code ==1) {
           setIsBookmarked(response.data.is_bookmarked == 1);
@@ -50,10 +50,10 @@ const [Loading,setLoading] = useState(true)
     }
     try {
       const response = await secureFetch('/bookmark', { event_id }, 'POST');
-      // console.log("res2",response);
+      // ("res2",response);
 
       if (response.code == 1) {
-        // console.log(response.data.is_bookmarked != 1);
+        // (response.data.is_bookmarked != 1);
         
         if(isBookmarked == false){
           setIsBookmarked(true)
@@ -63,14 +63,14 @@ const [Loading,setLoading] = useState(true)
           toast.success("Bookmark Removed")
         }
        
-        // console.log("toast for bookmarkl");
+        // ("toast for bookmarkl");
 
  
       } else {
         toast.error(response.message.keyword)
 
       }
-      // console.log("heel");
+      // ("heel");
       
     } catch (err) {
     toast.error(err.message)

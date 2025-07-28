@@ -4,11 +4,11 @@ const responsecode = require("../utilities/response-error-code")
 class Validator{
 
      async checkValidation(data,schema){
-        // console.log(data);
+        // (data);
         
         const {error} = await schema.validate(data,{abortEarly:true}) // this wiill be giving first erroe that appears
        if(error){
-        console.log(error)
+        (error)
         return{
           
             code: responsecode.OPERATION_FAILED,
