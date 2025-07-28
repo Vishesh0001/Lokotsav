@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/input-otp';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { encrypt } from '@/utils/crypto';
 const RESEND_TIMEOUT = 150; // 2.5 minutes in seconds
 const MAX_RESEND_ATTEMPTS = 3;
   const apiKey = process.env.NEXT_PUBLIC_API_KEY ;

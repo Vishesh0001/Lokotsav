@@ -22,26 +22,20 @@ async signUp(req, res) {
 }
 async login(req,res){
         try{
-          ("entered login")
-          // (req.body)
+     
           const requestData =await common.decodeBody(req.body);
-          // ('decode body',requestData);
-          // 
+
           const validationResponse = await validateWithJoi.checkValidation(requestData, schema.loginSchema);
-          // (validationResponse);
-          
+    
           if (validationResponse) {
               return common.sendResponse(req, res, validationResponse.code, validationResponse.message,validationResponse.data,400);
           }else{
-            // ("12");
-            
-      
           const response = await userModel.login(requestData);
-          ("response",response)
+    
           return common.sendResponse(req, res, response.code, response.message, response.data,response.status);}
       
         }catch(error){
-      ("login error",error.message)
+      // ("login error",error.message)
       return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
         }
 }
@@ -61,7 +55,7 @@ async resendOTP(req,res){
     const resp = await userModel.resendOTP(user_id)
     res.send(resp)
   } catch (error) {
-    (error);
+    // (error);
     
     res.send({code:2,message:{keyword:'server error'},data:[]})
   }
@@ -76,7 +70,7 @@ async logout(req,res){
                  return common.sendResponse(req,res,response.code,response.message,response.data,response.status)
           }
         } catch (error) {
-          ("logout error",error.message)
+          // ("logout error",error.message)
       return common.sendResponse(req, res, responsecode.UNAUTHORIZED, { keyword: "Something_went_wrong" }, {},500);
         }
 }
@@ -87,7 +81,7 @@ async logout(req,res){
     let response = await userModel.deleteaccount(request_data,user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -98,7 +92,7 @@ async logout(req,res){
     let response = await userModel.forgotpassword(request_data)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",e////////////////////////////rror.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -109,7 +103,7 @@ async logout(req,res){
     let response = await userModel.verifycode(request_data)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -120,7 +114,7 @@ async logout(req,res){
     let response = await userModel.resetPassword(request_data)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -129,23 +123,24 @@ async getEvents(req,res){
           let response = await userModel.eventListing()
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
+          // ("controller eror",error.message)
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
 }
 async getEvent(req,res){
         try {
-          // ('req body ',req.body);
+          console.log('req body ',req.body);
           
           let event_id = await common.decodeBody(req.body)
-          ('event_id',event_id);
+          // ('event_id',event_id);
           
           let response = await userModel.displayEvent(event_id)
+          // if(response.code==40){}
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
-          common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
+          console.log("controller eror",error.message)
+          common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_erroooor"},{},500)
           
         }
 }
@@ -155,7 +150,7 @@ async getFeaturedEvents(req,res){
           let response = await userModel.featuredEvents()
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
+          // ("controller eror",error.message)
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
@@ -170,7 +165,7 @@ async bookmark(req,res){
           let response = await userModel.bookmark(event_id,user_id)
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
+          // ("controller eror",error.message)
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
@@ -190,7 +185,7 @@ async getBookmarkStatus(req,res){
           let response = await userModel.getBookmarkStatus(event_id,user_id)
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
+          // ("controller eror",error.message)
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
@@ -217,32 +212,25 @@ async createEvent(req,res){
 }
  async getBookmarkedEvents(req,res){
   try {
-    // let event_id = await common.decodeBody(req.body)
-    // let event_id = req.body
-    // ("searchtrerm",searchTerm);
-    // ("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-    
+  
     const user_id = await common.getUserIdFromToken(req)
     let response = await userModel.getBookmarkedEvents(user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
     
   }
  }
  async getsubmitted(req,res){
   try {
-    // let event_id = await common.decodeBody(req.body)
-    // let event_id = req.body
-    // ("searchtrerm",searchTerm);
-    // ("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+ 
     
     const user_id = await common.getUserIdFromToken(req)
     let response = await userModel.getsubmitted(user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
     
   }
@@ -255,23 +243,20 @@ async searchEvent(req,res){
           let response = await userModel.searchEvent(searchTerm)
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
+          // ("controll/er eror",error.message)
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
 }
 async getApprovedEvents(req,res){
   try {
-    // let event_id = await common.decodeBody(req.body)
-    // let event_id = req.body
-    // ("searchtrerm",searchTerm);
-    // ("hellooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+   
     
     const user_id = await common.getUserIdFromToken(req)
     let response = await userModel.approvedEvents(user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
     
   }
@@ -282,7 +267,7 @@ async getApprovedEvents(req,res){
     let response = await userModel.UnapprovedEvents(user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // (///////////////"controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
     
   }
@@ -297,7 +282,7 @@ async getApprovedEvents(req,res){
           let response = await userModel.category(request_data)
           common.sendResponse(req,res,response.code,response.message,response.data,response.status)
         } catch (error) {
-          ("controller eror",error.message)
+          // ("controller eror",error.message)
           common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
           
         }
@@ -324,7 +309,7 @@ async getApprovedEvents(req,res){
             const requestData = await common.decodeBody(req.body);
          
             const response = await userModel.updateOrder(requestData);
-            (response);
+            // (response);
             
             return common.sendResponse(req, res, response.code, response.message, response.data,response.status);
         }catch (error) {
@@ -375,7 +360,7 @@ async getUnFeaturedEvents(req,res){
     let response = await userModel.getEventsForFeature(user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller/ eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -386,7 +371,7 @@ async getUnFeaturedEvents(req,res){
     let response = await userModel.featureorder(request_data,user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -397,7 +382,7 @@ async getUnFeaturedEvents(req,res){
     let response = await userModel.orderDetails(user_id)
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }
@@ -406,7 +391,7 @@ async getUnFeaturedEvents(req,res){
     let response = await userModel.trendingEvents()
     common.sendResponse(req,res,response.code,response.message,response.data,response.status)
   } catch (error) {
-    ("controller eror",error.message)
+    // ("controller eror",error.message)
     common.sendResponse(req,res,responsecode.SERVER_ERROR,{keyword:"txt_server_error"},{},500)
   }
  }

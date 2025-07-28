@@ -1,5 +1,5 @@
 export function GET() {
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.BASE_URL || 'https://lokotsav-dn5p.vercel.app/';
 
   const content = `
 User-agent: *

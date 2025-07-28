@@ -72,7 +72,7 @@ async signup(request_data){
             })
         }
     }catch(error){
-        (error)
+        // (error)
         return({
             code: responsecode.SERVER_ERROR,
             message: {keyword: "internal_server_error"},
@@ -83,7 +83,7 @@ async signup(request_data){
 }
 async verifyOTP(request_data) {
     try {
-        (request_data);
+        // (request_data);
         
         const otp = request_data.otp;
 
@@ -223,7 +223,7 @@ status:400
     })
    }
 } catch (error) {
-    (error);
+    // (error);
     
         return({
             code: responsecode.SERVER_ERROR,
@@ -318,7 +318,7 @@ async login(request_data){
             })
         }
     } catch (error) {
-        ("user model error", error.message)
+        // ("user model error", error.message)
         return ({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -329,13 +329,13 @@ async login(request_data){
 }
 async logout(userId){
     try {
-        ("entered logout")
+        // ("entered logout")
         // let updatequery =`update tbl_user set is_login= 0 where id=?`
         // let response = await db.query(updatequery,userId)
         // if(response.affectedRows!=0){
         let tokenresponse = await common.removeToken(userId)
         if(tokenresponse){
-            ("logged out");
+            // ("logged out");
             
             return({
                 code: responsecode.SUCCESS,
@@ -360,7 +360,7 @@ async logout(userId){
         //     })
         // }
     } catch (error) {
-        ("server error in model", error.message)
+        // ("server error in model", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -409,7 +409,7 @@ if(resp && resp.lenght!=0){
     
     }
 } catch (error) {
-    (error);
+    // (error);
     
         return({
             code: responsecode.SERVER_ERROR,
@@ -626,7 +626,7 @@ async eventListing(){
             })
         }
     } catch (error) {
-        ("model error", error.message)
+        // ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -637,7 +637,7 @@ async eventListing(){
 }
 async displayEvent(eventId){
     try {
-        // ("uuuuuuuuuuuuuuuuu",eventId);
+        console.log("uuuuuuuuuuuuuuuuu",eventId);
         
         let selectQuery = `select * from tbl_event where is_active=1 and is_deleted=0 and id = ?`
         let [response] = await db.query(selectQuery, eventId.id);
@@ -659,10 +659,10 @@ async displayEvent(eventId){
             })
         }
     } catch (error) {
-        ("model error", error.message)
+        console.log("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
-            message: { keyword: "internal_server_error" },
+            message: { keyword: `internal_server_erroer ${error.message}` },
             data: [],
             status: 500
         })
@@ -690,7 +690,7 @@ async featuredEvents(){
             })
         }
     } catch (error) {
-        ("model error", error.message)
+        // ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -727,7 +727,7 @@ async getBookmarkStatus(event_id, user_id){
             })
         }
     } catch (error) {
-        ("model error", error.message)
+        // ("model error", error.message)
         return({
             code: responsecode.SERVER_ERROR,
             message: { keyword: "internal_server_error" },
@@ -791,7 +791,7 @@ async bookmark(event_id, user_id) {
         }
 
     } catch (error) {
-        ("model error:", error.message);
+        // ("model error:", error.message);
         return {
             code: responsecode.SERVER_ERROR,
             message: { keyword: "txt_server_error" },
@@ -845,7 +845,7 @@ async createEvent (requestData,user_id){
                     })
             }
         } catch (error) {
-            ("modle error",error.message)
+            // ("modle error",error.message)
             return({
                 code:responsecode.SERVER_ERROR,
                 message:{keyword:"txt_server_error"},
@@ -887,7 +887,7 @@ WHERE eb.user_id = ?
             })
         }
         } catch (error) {
-            ('server error',error.message);
+            // ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -899,7 +899,7 @@ WHERE eb.user_id = ?
 }
 async getsubmitted(user_id){
         try {
-            (user_id);
+            // (user_id);
             
             let Selectquery = `SELECT e.*
 FROM tbl_event e
@@ -907,7 +907,7 @@ JOIN tbl_user u ON e.user_id = u.id
 WHERE u.role = 'user'and u.id=?;`
             let [responsee]  = await db.query(Selectquery,[user_id]) 
             let response = responsee
-            (response);
+            // (response);
             
            if(response){
             // let eventData = await this.displayEvent(response)
@@ -936,7 +936,7 @@ WHERE u.role = 'user'and u.id=?;`
 }
 async searchEvent(searchTerm){
     try {
-        ("search term",searchTerm);
+        // ("search term",searchTerm);
         let selectQuery = `SELECT * FROM tbl_event WHERE is_active=1 AND is_deleted=0 and is_approved=1`;
         let params = [];
 
@@ -978,7 +978,7 @@ return({
         })
        }
     } catch (error) {
-        ("modle error",error.message)
+        // ("modle error",error.message)
         return({
             code:responsecode.SERVER_ERROR,
             message:{keyword:"txt_server_error"},
@@ -1013,7 +1013,7 @@ async approvedEvents(user_id){
             })
         }
         } catch (error) {
-            ('server error',error.message);
+            // ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1049,7 +1049,7 @@ async UnapprovedEvents(user_id){
             })
         }
         } catch (error) {
-            ('server error',error.message);
+            // ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1084,7 +1084,7 @@ async category(request_data){
         }
 
     } catch (error) {
-         ('server error',error.message);
+        //  ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1140,7 +1140,7 @@ async checkBookingStatus(request_data, user_id) {
             status: 200
         };
     } catch (error) {
-        ("Server Error:", error.message);
+        // ("Server /Error:", error.message);
         return {
             code: responsecode.SERVER_ERROR,
             message: { keyword: "Server error occurred" },
@@ -1151,11 +1151,11 @@ async checkBookingStatus(request_data, user_id) {
 }
 async createOrder(request_data,user_id){
     try {
-        (request_data);
+        // (request_data);
       let event_id = request_data.event_id;
                      let ticketsBooked = `select sum(quantity) as total_booked from tbl_order where is_active=1 and is_deleted=0 and status = 'paid' and user_id=? and event_id=? and order_type='buy-tickets'`
             let [res1] = await db.query(ticketsBooked,[user_id,event_id])
-            ('weew',res1);
+            // ('weew',res1);
             let final_total_tickets = Number(res1[0].total_booked)+Number(request_data.quantity)
             if(final_total_tickets > 10){
                 return ({
@@ -1197,7 +1197,7 @@ async createOrder(request_data,user_id){
         }
 
     } catch (error) {
-        ("server errror",error.message);
+        // ("server errror",error.message);
         
             return({
                    code:responsecode.SERVER_ERROR,
@@ -1209,7 +1209,7 @@ async createOrder(request_data,user_id){
 }
 async updateOrder(request_data) {
     try {
-        (request_data);
+        // (request_data);
         
         let id = request_data.order_id;
         let total_amount = request_data.total_amount;
@@ -1234,11 +1234,11 @@ async updateOrder(request_data) {
             `;
 
             let [bookedResult] = await db.query(ticketsBooked, [user_id, event_id]);
-            ('weew', bookedResult);
+            // ('weew', bookedResult);
 let final_total_tickets = Number(bookedResult[0].total_booked) + Number(quantity)
 
             if (final_total_tickets > 10) {
-                (final_total_tickets);
+                // (final_total_tickets);
                 
                 return {
                     code: responsecode.OPERATION_FAILED,
@@ -1274,7 +1274,7 @@ let final_total_tickets = Number(bookedResult[0].total_booked) + Number(quantity
         }
 
     } catch (error) {
-        (error);
+        // (error);
 
         return {
             code: responsecode.SERVER_ERROR,
@@ -1485,7 +1485,7 @@ async getEventsForFeature(user_id){
             })
         }
         } catch (error) {
-            ('server error',error.message);
+            // ('server error',error.message);
             
             return({
                 code:responsecode.SERVER_ERROR,
@@ -1562,7 +1562,7 @@ ORDER BY p.payment_time DESC;
             })
         }
     } catch (error) {
-        ('server err',error);
+        // ('server err',error);
         
                return({
                 code:responsecode.SERVER_ERROR,

@@ -14,7 +14,10 @@ export const metadata = {
   openGraph: {
     title: "Lokotsav",
     description: "Discover trending events and book tickets easily.",
-    url: "https://yourdomain.com",
+      icons: {
+    icon: "/favicon.ico",
+  },
+    url: "https://lokotsav-dn5p.vercel.app/",
     siteName: "Lokotsav",
   
     locale: "en_US",

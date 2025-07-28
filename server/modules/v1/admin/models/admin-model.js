@@ -51,7 +51,7 @@ try {
                 })
         }
     } catch (error) {
-        ("modle error",error.message)
+        // ("modle error",error.message)
         return({
             code:responsecode.SERVER_ERROR,
             message:{keyword:"server error"},
@@ -84,7 +84,7 @@ async approveEvent(requestData) {
       };
     }
   } catch (error) {
-    ("approveEvent model error:", error.message);
+    // ("approveEvent model error:", error.message);
     return {
       code: responsecode.SERVER_ERROR,
       message: { keyword: "server error" },
@@ -115,7 +115,7 @@ async deleteEvent(event_id){
              })
         }
     } catch (error) {
-        ("modle error",error.message)
+        // ("modle error",error.mes/sage)
         return({
             code:responsecode.SERVER_ERROR,
             message:{keyword:"txt_server_error"},
@@ -189,7 +189,7 @@ async deleteUser(user_id) {
       };
     }
   } catch (error) {
-    ("model error (deleteUser):", error.message);
+    // ("model error (deleteUser):", error.message);
     return {
       code: responsecode.SERVER_ERROR,
       message: { keyword: "txt_server_error" },
@@ -200,7 +200,7 @@ async deleteUser(user_id) {
 }
 async blockUser(user_id) {
   try {
-    (user_id);
+    // (user_id);
     
     const updateQuery = `UPDATE tbl_user SET is_active = 0 WHERE id = ?`;
     const [response] = await db.query(updateQuery, [user_id.id]);
@@ -221,7 +221,7 @@ async blockUser(user_id) {
       };
     }
   } catch (error) {
-    ("model error (blockUser):", error.message);
+    // ("model error (blockUser):", error.message);
     return {
       code: responsecode.SERVER_ERROR,
       message: { keyword: "txt_server_error" },
@@ -240,7 +240,7 @@ async unapprovedEvents(){
       JOIN tbl_user u ON u.id = e.user_id
       WHERE u.is_active = 1 AND u.is_deleted = 0 AND e.is_approved = 0 and e.is_deleted=0`
         const [response] = await db.query(selectQuery)
-        (response);
+        // (response);
         
         if(response){
             if(response.length==0){
@@ -269,7 +269,7 @@ async unapprovedEvents(){
             status:300
         })}
     } catch (error) {
-        ("modle error",error.message)
+        // ("modle error",error.message)
         return({
             code:responsecode.SERVER_ERROR,
             message:{keyword:"txt_server_error"},
@@ -298,7 +298,7 @@ async getEventById(requestData) {
       };
     }
   } catch (error) {
-    ('model error', error.message);
+    // ('model error', error.message);
     return {
       code: responsecode.SERVER_ERROR,
       message: { keyword: 'txt_server_error' },
@@ -343,7 +343,7 @@ async updateEvent(requestData) {
       };
     }
   } catch (error) {
-    ('model error', error.message);
+    // ('model error', error.message);
     return {
       code: responsecode.SERVER_ERROR,
       message: { keyword: 'txt_server_error' },
