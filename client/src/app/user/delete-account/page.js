@@ -24,7 +24,8 @@ const router = useRouter();
       if (result.code==1) {
         toast.success('Your account has been deleted');
          Cookies.remove('token', { path: '/' });
-      router.push('/')
+        window.location.href = '/';
+
       } else {
         toast.error(result.message.keyword || 'Could not delete account');
       }

@@ -1,4 +1,5 @@
 "use client";
+//checked
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
@@ -27,28 +28,30 @@ export default function Login() {
   
         
         if (resposne.code != 1) {
-          // throw new Error(data.message?.keyword || "Login failed");
+
           toast.warning(resposne.message.keyword)
           if(resposne.code == 4){
             router.push('/verify-otp')
           }
         }else{
-          // ('visheeee',resposne);
+
           
           const tokenExpiry = new Date(Date.now() + 24* 60 * 60 * 1000); // 5 hour
         Cookies.set("token", resposne.data.token, { expires: tokenExpiry, path: '/' });
-        // alert("Login successful");
+
         toast.success("login successfull")
-        if(resposne.data.role=='admin'){router.push('/admin/dashboard')}
+        if(resposne.data.role=='admin'){  window.location.href = '/admin/dashboard';
+}
        else{
-        router.push('/');}
+          window.location.href = '/';
+}
         toast.success('Welcome to Lokotsav!')
       }
 
       } catch (error) {
-        // ("error in login page", error.message);
+   
        toast.error(error.message)
-        // alert(error.message);
+   
       } finally {
         setSubmitting(false);
       }

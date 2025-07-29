@@ -1,4 +1,5 @@
 "use client";
+//checked
 import { Bookmark } from 'lucide-react';
 import { BookmarkCheck } from 'lucide-react';
 
@@ -18,10 +19,7 @@ const [Loading,setLoading] = useState(true)
       try {
       const token = Cookies.get("token");
         if (!token) return; // Don't check if not logged in
-        
-        const response = await secureFetch('/getbookmark', { event_id }, 'POST');
-        // ('erwerwerwer',response);
-        
+        const response = await secureFetch('/getbookmark', { event_id }, 'POST');      
         if (response.code ==1) {
           setIsBookmarked(response.data.is_bookmarked == 1);
         }
@@ -38,7 +36,6 @@ const [Loading,setLoading] = useState(true)
 
   const toggleBookmark = async () => {
         const token = Cookies.get("token");
-
     if (!token) {
       toast.warning("You need to login first", {
         action: {
@@ -49,12 +46,8 @@ const [Loading,setLoading] = useState(true)
       return;
     }
     try {
-      const response = await secureFetch('/bookmark', { event_id }, 'POST');
-      // ("res2",response);
-
+      const response = await secureFetch('/bookmark', { event_id }, 'POST');;
       if (response.code == 1) {
-        // (response.data.is_bookmarked != 1);
-        
         if(isBookmarked == false){
           setIsBookmarked(true)
           toast.success("Event Bookmarked")
@@ -62,15 +55,10 @@ const [Loading,setLoading] = useState(true)
           setIsBookmarked(false);
           toast.success("Bookmark Removed")
         }
-       
-        // ("toast for bookmarkl");
-
- 
       } else {
         toast.error(response.message.keyword)
 
-      }
-      // ("heel");
+      };
       
     } catch (err) {
     toast.error(err.message)

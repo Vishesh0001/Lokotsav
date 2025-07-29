@@ -1,5 +1,5 @@
 'use client';
-
+//checked
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -23,12 +23,8 @@ import {
   Plus,
   LayoutDashboard,
   CreditCard,
-  Events,
-  List,
   Menu,
-  House,
   SquareGanttChart,
-  Trash,
   Trash2,
   File
 } from 'lucide-react';
@@ -54,7 +50,7 @@ export default function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     const query = new URLSearchParams();
-    ('sdsdsdsds',search,location);
+   
     
     if(!search && !location){
     toast('Please enter a search keyword or Select any city')

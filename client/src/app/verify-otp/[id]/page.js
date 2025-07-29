@@ -1,7 +1,7 @@
 'use client';
-
+//checked
 import { useState,useEffect } from 'react';
-import { useRouter ,useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import {
   InputOTP,
@@ -20,12 +20,12 @@ const MAX_RESEND_ATTEMPTS = 3;
 export default function VerifyOtpPage() {
   const [otp, setOtp] = useState('');
     const { id } = useParams();
-  // const [errorMsg, setErrorMsg] = useState('');
+ 
   const [loading, setLoading] = useState(false);
     const [resendLoading, setResendLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(90);
   const [resendAttempts, setResendAttempts] = useState(0);
-  const router = useRouter();
+ 
 
     useEffect(() => {
     if (resendTimer === 0) return;
@@ -60,8 +60,8 @@ toast.warning('Enter OTP of 6 digits')
                  const tokenExpiry = new Date(Date.now() +  24*60 * 60 * 1000); // 5mins   hour
                Cookies.set("token", result.data.token, { expires: tokenExpiry, path: '/' });
                toast.success('verification completed')
-        router.push('/');
-        toast('welcome to Lokotsav')
+               toast('welcome to Lokotsav')
+          window.location.href = '/'; 
       } else {
         toast.error('Invalid OTP. Please try again.')
         // setErrorMsg('Invalid OTP. Please try again.');
@@ -91,9 +91,7 @@ toast.warning('Enter OTP of 6 digits')
       });
 
       const result = await res.json();
-// ('ressss',result
 
-// );
 
       if (result.code == 1) {
         toast.success('OTP resent successfully');

@@ -2,20 +2,17 @@
 
 import { encrypt } from "@/utils/crypto";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 export default function Logout() {
-  const router = useRouter();
+
   const apiKey = process.env.NEXT_PUBLIC_API_KEY ;
   const BaseURL = process.env.NEXT_PUBLIC_API_BASE_URL
   const encryptedApiKey =encrypt(apiKey)
   async function handleLogout() {
     const token = Cookies.get("token");
     const encryptedToken = encrypt(token)
-    // ("token", token);
-
     try {
       const response = await fetch(`${BaseURL}/v1/user/logout`, {
         method: 'GET',
@@ -23,19 +20,12 @@ export default function Logout() {
           'Content-Type': 'application/json',
           token: encryptedToken,
           'api-key': encryptedApiKey,
-
         },
       });
-// (response);
-
-   
       if (response.status == 200) {
-        // ('Before logout:', Cookies.get('token'));
         Cookies.remove('token', { path: '/' });
-        // ('After logout:', Cookies.get('token'));
-        //  Cookies.remove("token",{path:'/'});
        toast.success('logout success!')
-        router.push("/login");
+         window.location.href = '/login';
       } else {
        toast.warning(response.message.keyword)
       }
@@ -46,12 +36,6 @@ export default function Logout() {
   }
 
   return (
-    // <button
-    //   onClick={handleLogout}
-    //   className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors duration-200"
-    // >
-    //   Logout
-    // </button>
     <Button
   onClick={handleLogout} 
   variant='outline'

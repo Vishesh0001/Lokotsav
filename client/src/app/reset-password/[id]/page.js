@@ -1,5 +1,5 @@
 'use client';
-
+//checked
 import { decrypt } from '@/utils/crypto';
 import secureFetch from '@/utils/securefetch';
 import { useParams, useRouter } from 'next/navigation';
@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
       }
 
     } catch (err) {
-      // ('ererer',err.message);
+  
       
       toast.error('Something went wrong. Please try later.');
     } finally {
