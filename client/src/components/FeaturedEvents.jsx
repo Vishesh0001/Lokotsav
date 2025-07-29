@@ -32,16 +32,14 @@ export default async function EventsPage() {
     method: "GET",
   headers: {
     "Content-Type": "application/json",
-    "api-key": encryptedApiKey, // Replace with actual key
+    "api-key": encryptedApiKey, 
  
   },
   }); 
 
-  // Decrypt the response
-  // ('ere',res);
   
   const responseText = await res.text();
-  // ('sss',responseText);
+
   
   const decrypteddata = decrypt(responseText);
    events = decrypteddata.data;
@@ -59,44 +57,52 @@ export default async function EventsPage() {
 
   return (
   <section>
-    <div className="w-full h-17 max-w-screen-xxl mt-4 mb-6 px-4">
-      <div className=" h-20 relative bg-gradient-to-r from-accent/10 via-softPink/10 to-accent/10 border border-accent/20 rounded-2xl p-6 overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-softPink/5"></div>
-        <div className="absolute top-4 right-4 opacity-10">
-          <Sparkles className="h-16 w-16 text-accent" />
+   <div className="w-full max-w-screen-xxl mt-4 mb-6 px-4">
+  <div className="relative bg-gradient-to-r from-accent/10 via-softPink/10 to-accent/10 border border-accent/20 rounded-2xl p-4 sm:p-6 overflow-hidden">
+    
+    {/* Background decoration */}
+    <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-softPink/5"></div>
+    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-10">
+      <Sparkles className="h-12 w-12 sm:h-16 sm:w-16 text-accent" />
+    </div>
+
+    {/* Main content */}
+    <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      
+      {/* Left side */}
+      <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
+        <div className="bg-accent/20 p-2 sm:p-3 rounded-full">
+          <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-accent" />
         </div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-accent/20 p-3 rounded-full">
-              <Sparkles className="h-6 w-6 text-accent" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-deepNavy">Get Your Event Featured!</h3>
-              <p className="text-gray-600 text-sm">Stand out and reach more attendees</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-2xl font-bold text-accent">
-                <IndianRupee className="h-6 w-6" />
-                <span>99</span>
-              </div>
-              <p className="text-xs text-gray-600">only</p>
-            </div>
-            
-            <Link href="/user/unfeatured-events">
-              <button className="bg-accent hover:bg-accent/90 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2">
-                Feature Now
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </Link>
-          </div>
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-deepNavy">Get Your Event Featured!</h3>
+          <p className="text-gray-600 text-sm sm:text-base">Stand out and reach more attendees</p>
         </div>
       </div>
+
+      {/* Right side */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+        
+        <div className="text-center sm:text-left">
+          <div className="flex items-center justify-start sm:justify-center gap-1 text-xl sm:text-2xl font-bold text-accent">
+            <IndianRupee className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span>99</span>
+          </div>
+          <p className="text-xs text-gray-600">only</p>
+        </div>
+
+        <Link href="/user/unfeatured-events" className="w-full sm:w-auto">
+          <button className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
+            Feature Now
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </Link>
+
+      </div>
     </div>
+  </div>
+</div>
+
   <h1 className="text-5xl text-transparent text-center bg-gradient-to-br from-deepNavy via-accent to-softPink bg-clip-text">
     Featured Events
   </h1>
