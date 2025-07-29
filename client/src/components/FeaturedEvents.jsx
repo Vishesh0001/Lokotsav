@@ -27,15 +27,15 @@ export default async function EventsPage() {
   const encryptedApiKey =encrypt(apiKey)
   let events
   try {
-      const res = await fetch(`${BaseURL}/v1/user/featuredEvents`, {
-   next: { revalidate: 300 }, // cache for 5 minutes
+     const res = await fetch(`${BaseURL}/v1/user/featuredEvents`, {
+  cache: 'no-store', // cache for 5 minutes
     method: "GET",
   headers: {
     "Content-Type": "application/json",
     "api-key": encryptedApiKey, // Replace with actual key
  
   },
-  });
+  }); 
 
   // Decrypt the response
   // ('ere',res);
