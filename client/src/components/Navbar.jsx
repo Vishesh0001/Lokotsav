@@ -67,9 +67,9 @@ export default function Navbar() {
   
         <div className="flex items-center space-x-3">
           <Link href="/">
-            <Radar className="h-10 w-10 text-gray-500 hover:text-purple-400 transition" />
+            <Radar className="h-10 w-10 text-deepNavy hover:text-accent transition" />
           </Link>
-          <Link href="/" className="text-3xl font-bold text-softPink hover:text-accent transition">
+          <Link href="/" className="text-3xl font-bold text-deepNavy hover:text-accent transition">
             Lokotsav
           </Link>
         </div>

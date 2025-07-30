@@ -40,25 +40,28 @@ export default function HeroSection() {
           Discover amazing concerts, vibrant meetups, creative workshops, and exciting community events 
           happening right in your neighborhood. Join the local celebration!
         </p>
+<div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
+  <Link href="/events">
+    <Button 
+      size="lg" 
+      className="px-12 py-4 text-lg font-semibold rounded-lg shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 bg-accent text-white hover:bg-accent/90">
+      <PartyPopper className="mr-3"/> 
+      Explore Events
+    </Button>
+  </Link>
+  <Link href='/user/create-event'>
+    <Button 
+      variant="outline" 
+      size="lg" 
+      className="px-12 py-4 text-lg font-semibold rounded-lg border-2 border-accent text-accent bg-white hover:bg-accent hover:text-white hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+      <BadgePlus className="mr-3"/> 
+      Create Event
+    </Button>
+  </Link>
+</div>
 
   
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/events">
-            <Button 
-              size="lg" 
-              className="px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 bg-accent hover:bg-accent/90 text-white border-2 border-softPink">
-              <PartyPopper/> Explore Events
-            </Button>
-          </Link>
-          <Link href='/user/create-event'>
-          <Button 
-            variant="outline" 
-            size="lg" 
-            className="px-8 py-4 text-lg font-semibold rounded-full border-2 border-softPink text-accent bg-transparent hover:bg-softPink/10 hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-            <BadgePlus/> Create Event
-          </Button>
-          </Link>
-        </div>
+ 
         <Categories/>
       </div>
 
