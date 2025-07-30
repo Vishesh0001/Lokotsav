@@ -17,7 +17,7 @@ export const metadata = {
       icons: {
     icon: "/favicon.ico",
   },
-    url: "https://lokotsav-dn5p.vercel.app/",
+    url: "https://lokotsav.vercel.app/",
     siteName: "Lokotsav",
   
     locale: "en_US",
