@@ -18,9 +18,10 @@ import {
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useState } from 'react';
+const now = new Date();
 const validationSchema = Yup.object().shape({
   event_title: Yup.string().required('Event title is required'),
-  start_time: Yup.date().required('Start time is required'),
+  start_time: Yup.date().min(now, 'Start time cannot be in the past').required('Start time is required'),
   end_time: Yup.date()
     .min(Yup.ref('start_time'), 'End time must be after start time')
     .required('End time is required'),
